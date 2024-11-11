@@ -22,7 +22,10 @@ function SideMenu({ children }) {
     {
       name: "Settings",
       icon: MdOutlineSettings,
-      subItems: [{ name: "Network Configuration", link: "/network-configuration" }],
+      subItems: [
+        { name: "Network Configuration", link: "/network-configuration" },
+        { name: "Static ARP", link:"#"},
+      ],
     },
   ];
 
