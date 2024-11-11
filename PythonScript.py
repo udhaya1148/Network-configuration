@@ -10,10 +10,10 @@ import glob
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-def install_avahi():
-    result = subprocess.run(['dpkg', '-l', 'avahi-daemon'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if b'avahi-daemon' not in result.stdout:
-        subprocess.run(['sudo', 'apt-get', 'install', '-y', 'avahi-daemon'], check=True)
+# def install_avahi():
+#     result = subprocess.run(['dpkg', '-l', 'avahi-daemon'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+#     if b'avahi-daemon' not in result.stdout:
+#         subprocess.run(['sudo', 'apt-get', 'install', '-y', 'avahi-daemon'], check=True)
 
 def subnet_to_cidr(subnet):
     netmask = list(map(int, subnet.split('.')))
@@ -66,7 +66,7 @@ def get_network_info_from_netplan():
 
 @app.route('/network-info', methods=['GET'])
 def network_info():
-    install_avahi()
+    # install_avahi()
     network_info = get_network_info_from_netplan()
     return jsonify({"network_info": network_info})
 
