@@ -10,7 +10,7 @@ function MainDashboard() {
           src="http://172.18.1.205:3000/"
           
           frameBorder="0"
-          title="smf"
+          title="Dashboard"
           className="w-full h-full"
         ></iframe>
     </div>
