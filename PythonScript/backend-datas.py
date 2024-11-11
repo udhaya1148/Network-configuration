@@ -6,14 +6,30 @@ import os
 import subprocess
 import yaml
 import glob
+import sys
+
+# Check if Gunicorn is installed; if not, install it using apt
+def check_and_install_gunicorn():
+    try:
+        # Attempt to check Gunicorn installation
+        subprocess.check_call(['gunicorn', '--version'])
+        print("Gunicorn is already installed.")
+    except FileNotFoundError:
+        # Gunicorn not found, install using apt
+        print("Gunicorn is not installed. Installing Gunicorn using apt...")
+        try:
+            subprocess.check_call(['sudo', 'apt', 'update'])
+            subprocess.check_call(['sudo', 'apt', 'install', '-y', 'gunicorn'])
+            print("Gunicorn installed successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to install Gunicorn: {e}")
+            sys.exit(1)
+
+# Install Gunicorn if necessary
+check_and_install_gunicorn()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
-
-# def install_avahi():
-#     result = subprocess.run(['dpkg', '-l', 'avahi-daemon'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-#     if b'avahi-daemon' not in result.stdout:
-#         subprocess.run(['sudo', 'apt-get', 'install', '-y', 'avahi-daemon'], check=True)
 
 def subnet_to_cidr(subnet):
     netmask = list(map(int, subnet.split('.')))
@@ -66,7 +82,6 @@ def get_network_info_from_netplan():
 
 @app.route('/network-info', methods=['GET'])
 def network_info():
-    # install_avahi()
     network_info = get_network_info_from_netplan()
     return jsonify({"network_info": network_info})
 
@@ -137,5 +152,13 @@ def update_network():
 
     return jsonify({'status': 'success'})
 
+def run_with_gunicorn():
+    """Run the app with Gunicorn instead of Flask's development server."""
+    # Get the script filename dynamically and remove the .py extension
+    script_name = os.path.splitext(os.path.basename(__file__))[0]
+
+    # Start Gunicorn with 4 worker processes
+    subprocess.run(['gunicorn', '-w', '4', '-b', '0.0.0.0:8000', f'{script_name}:app'])
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    run_with_gunicorn()
