@@ -158,7 +158,7 @@ def run_with_gunicorn():
     script_name = os.path.splitext(os.path.basename(__file__))[0]
 
     # Start Gunicorn with 4 worker processes
-    subprocess.run(['gunicorn', '-w', '4', '-b', '0.0.0.0:8000', f'{script_name}:app'])
+    subprocess.run(['gunicorn', '-w', '4', '-b', '0.0.0.0:5000', f'{script_name}:app'])
 
 if __name__ == '__main__':
     run_with_gunicorn()
