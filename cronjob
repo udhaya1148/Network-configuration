@@ -1,0 +1,4 @@
+sudo cp -i /home/netcon/netplan/Network-configuration/PythonScript/backend-datas.py /bin
+sudo crontab -e
+@reboot /usr/bin/python3 /bin/backend-datas.py
+sudo chmod +x /bin/backend-datas.py
