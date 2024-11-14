@@ -56,19 +56,26 @@ def get_interfaces():
     except Exception as e:
         return {'error': str(e)}
 
-# Add static ARP entry, save to file, make executable, and run immediately
+# Add static ARP entry, save to file, make executable, and run immediately without deleting existing entries
 def add_static_arp(ip, mac, iface):
     try:
         # Static ARP entry command
         arp_entry = f"arp -s {ip} {mac} -i {iface}\n"
         
-        # Create the script with a shebang and the arp entry
-        script_content = f"#!/bin/bash\n{arp_entry}"
-        
-        # Write the script to the file
-        with open(ARP_FILE_PATH, 'w') as file:
-            file.write(script_content)
-        
+        # Check if the ARP entry already exists in the script
+        if os.path.exists(ARP_FILE_PATH):
+            with open(ARP_FILE_PATH, 'r') as file:
+                existing_script = file.read()
+                if arp_entry not in existing_script:
+                    # Append the new ARP entry to the file if it doesn't exist
+                    with open(ARP_FILE_PATH, 'a') as file:
+                        file.write(arp_entry)
+        else:
+            # Create a new script if it doesn't exist
+            script_content = f"#!/bin/bash\n{arp_entry}"
+            with open(ARP_FILE_PATH, 'w') as file:
+                file.write(script_content)
+
         # Make the file executable
         os.chmod(ARP_FILE_PATH, 0o755)  # 755 permissions to make it executable
 
