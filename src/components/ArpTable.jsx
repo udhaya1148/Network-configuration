@@ -9,7 +9,6 @@ const ArpTable = () => {
   const [iface, setIface] = useState("");
   const [interfaces, setInterfaces] = useState([]);
   const [ipError, setIpError] = useState(""); // Track IP error state
-  const [macError, setMacError] = useState(""); // Track MAC error state
 
   // Function to fetch ARP data
   const fetchArpData = async () => {
@@ -46,11 +45,6 @@ const ArpTable = () => {
       return;
     }
 
-    if (!isValidMac(mac)) {
-      setMacError("Invalid MAC address format.");
-      return;
-    }
-
     const arpEntry = { ip, mac, iface };
     try {
       const response = await fetch("http://10.0.0.44:8000/api/arp/static", {
@@ -78,12 +72,6 @@ const ArpTable = () => {
     return regex.test(ipAddress);
   };
 
-  // Function to validate MAC address format
-  const isValidMac = (macAddress) => {
-    const regex = /^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/;
-    return regex.test(macAddress);
-  };
-
   useEffect(() => {
     fetchArpData();
     fetchInterfaces();
@@ -100,13 +88,18 @@ const ArpTable = () => {
     }
   };
 
+  // Function to format MAC address for display with colons
+  const formatMacForDisplay = (macAddress) => {
+    return macAddress
+      .replace(/[^a-fA-F0-9]/g, "") // Only keep hexadecimal characters
+      .slice(0, 12) // Limit to 12 characters (6 pairs of hex)
+      .replace(/(.{2})(?=.)/g, "$1:"); // Insert colons every two characters
+  };
+
   // Handle MAC address input (remove colons for internal state)
   const handleMacChange = (e) => {
-    const value = e.target.value.replace(/[^a-fA-F0-9:]/g, ""); // Allow only hexadecimal characters and colons
-    setMac(value);
-    if (isValidMac(value)) {
-      setMacError(""); // Clear error if MAC is valid
-    }
+    const rawMac = e.target.value.replace(/[^a-fA-F0-9]/g, ""); // Remove non-hex characters
+    setMac(rawMac); // Update state with raw MAC address (without colons)
   };
 
   if (error) {
@@ -173,12 +166,11 @@ const ArpTable = () => {
             <label className="block font-bold">MAC Address</label>
             <input
               type="text"
-              value={mac}
+              value={formatMacForDisplay(mac)} // Format for display with colons
               onChange={handleMacChange}
-              placeholder="e.g., AA:BB:CC:DD:EE:FF"
+              placeholder="e.g., AABBCCDDEEFF"
               className="w-full p-2 border border-gray-300 rounded-lg"
             />
-            {macError && <div className="text-red-500 text-sm">{macError}</div>}
           </div>
 
           <button
