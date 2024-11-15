@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the directory to watch
-WATCH_DIR="/home/netcon/netplan/Network-configuration/PythonScript"
+WATCH_DIR="/home/netcon/netplan/Network-configuration/PythonScript/start-vite.sh"
 
 # Navigate to your project directory
 cd "$WATCH_DIR" || exit
