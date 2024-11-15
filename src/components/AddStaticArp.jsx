@@ -13,7 +13,7 @@ const ArpTable = () => {
   // Function to fetch ARP data
   const fetchArpData = async () => {
     try {
-      const response = await fetch("http://10.0.0.44:8000/api/arp");
+      const response = await fetch("http://172.18.1.224:8000/api/arp");
       if (!response.ok) {
         throw new Error("Failed to fetch ARP data");
       }
@@ -27,7 +27,7 @@ const ArpTable = () => {
   // Function to fetch available network interfaces for the select dropdown
   const fetchInterfaces = async () => {
     try {
-      const response = await fetch("http://10.0.0.44:8000/api/interfaces");
+      const response = await fetch("http://172.18.1.224:8000/api/interfaces");
       if (!response.ok) {
         throw new Error("Failed to fetch interfaces");
       }
@@ -47,7 +47,7 @@ const ArpTable = () => {
 
     const arpEntry = { ip, mac, iface };
     try {
-      const response = await fetch("http://10.0.0.44:8000/api/arp/static", {
+      const response = await fetch("http://172.18.1.224:8000/api/arp/static", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -58,6 +58,12 @@ const ArpTable = () => {
       if (response.ok) {
         alert("Static ARP entry added successfully!");
         fetchArpData(); // Refresh the ARP table after adding entry
+
+        // Clear input fields after successful addition
+        setIp("");
+        setMac("");
+        setIface("");
+        setIpError(""); // Clear any IP error messages
       } else {
         alert(`Error: ${result.error}`);
       }
@@ -135,7 +141,7 @@ const ArpTable = () => {
 
         {/* Form for adding static ARP entry */}
         <div className="border border-gray-500 p-4 bg-white rounded-lg shadow-lg mt-6">
-          <h4 className="text-xl text-blue-600 font-bold mb-2">Add Static ARP </h4>
+          <h4 className="text-xl text-blue-600 font-bold mb-2">Add Static ARP</h4>
           <div className="mb-4">
             <label className="block font-bold">Interface</label>
             <select
