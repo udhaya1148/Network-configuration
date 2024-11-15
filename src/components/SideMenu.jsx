@@ -25,6 +25,8 @@ function SideMenu({ children }) {
       subItems: [
         { name: "Network Configuration", link: "/network-configuration" },
         { name: "Static ARP", link:"#"},
+        { name: "Add Static ARP", link:"#"},
+        { name: "Delete ARP", link:"#"},
       ],
     },
   ];
