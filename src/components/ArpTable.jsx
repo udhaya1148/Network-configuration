@@ -14,8 +14,10 @@ const ArpTable = () => {
       }
       const data = await response.json();
       setArpData(data);
+      setError(null); // Clear the error when data fetch is successful
     } catch (err) {
       setError(err.message);
+      setArpData([]); // clear the ARP data to avoid showing stale data
     }
   };
 
