@@ -1,12 +1,30 @@
 #!/bin/bash
 
+# Define the directory to watch
+WATCH_DIR="/home/netcon/netplan/Network-configuration/PythonScript"
+
 # Navigate to your project directory
-cd /home/netcon/netplan/Network-configuration/PythonScript
+cd "$WATCH_DIR" || exit
 
-# Build the project
-npm run build
+# Function to build and preview the project
+start_server() {
+    echo "Building project..."
+    npm run build
 
-# Start the server using `serve` on port 3000 or any preferred port
-#serve -s dist -l 3003
+    echo "Starting server..."
+    npm run preview
+}
 
-npm run preview
+# Initial start
+start_server
+
+# Monitor for changes in the project directory
+inotifywait -m -r -e modify,create,delete "$WATCH_DIR" | while read -r path action file; do
+    echo "Detected change: $action on $file in $path. Restarting server..."
+    
+    # Kill the previous server instance
+    pkill -f "npm run preview"
+    
+    # Rebuild and start server again
+    start_server
+done
