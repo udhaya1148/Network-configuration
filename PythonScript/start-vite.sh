@@ -1,41 +1,30 @@
 #!/bin/bash
 
-# Set your project directory
-WATCH_DIR="/home/netcon/netplan/Network-configuration/PythonScript"
+# Define the directory to watch
+WATCH_DIR="/home/netcon/netplan/Network-configuration/"
 
 # Navigate to your project directory
-cd "$WATCH_DIR" || { echo "Failed to change directory to $WATCH_DIR"; exit 1; }
+cd "$WATCH_DIR" || exit
 
-# Function to build and start the server
+# Function to build and preview the project
 start_server() {
     echo "Building project..."
     npm run build
 
     echo "Starting server..."
-    # Start the server in the background so we can kill it when needed
-    npm run preview &
-    SERVER_PID=$!
+    npm run preview
 }
 
-# Initial build and start
+# Initial start
 start_server
 
-# Install inotify-tools if it's not installed
-if ! command -v inotifywait &> /dev/null; then
-    echo "Installing inotify-tools..."
-    sudo apt update && sudo apt install -y inotify-tools
-fi
-
-# Monitor the directory for changes and restart the server
-inotifywait -m -r -e modify,create,delete "$WATCH_DIR" |
-while read -r directory action file; do
-    echo "Detected $action on $file. Restarting server..."
+# Monitor for changes in the project directory
+inotifywait -m -r -e modify,create,delete "$WATCH_DIR" | while read -r path action file; do
+    echo "Detected change: $action on $file in $path. Restarting server..."
     
     # Kill the previous server instance
-    if [[ -n $SERVER_PID ]]; then
-        kill $SERVER_PID
-    fi
+    pkill -f "npm run preview"
     
-    # Restart the server
+    # Rebuild and start server again
     start_server
 done
