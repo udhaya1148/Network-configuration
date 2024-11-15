@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import MainDashboard from "./components/MainDashboard";
 import NetworkConfiguration from "./components/Network-Configuration";
+import ArpTable from "./components/ArpTable";
 
 function App() {
   return (
