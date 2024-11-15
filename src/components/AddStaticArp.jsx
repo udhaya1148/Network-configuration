@@ -135,7 +135,7 @@ const ArpTable = () => {
 
         {/* Form for adding static ARP entry */}
         <div className="border border-gray-500 p-4 bg-white rounded-lg shadow-lg mt-6">
-          <h4 className="text-xl font-bold mb-2">Add Static ARP </h4>
+          <h4 className="text-xl text-blue-600 font-bold mb-2">Add Static ARP </h4>
           <div className="mb-4">
             <label className="block font-bold">Interface</label>
             <select
