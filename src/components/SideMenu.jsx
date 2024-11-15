@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { BsFillArrowLeftCircleFill } from "react-icons/bs";
 import { MdOutlineDashboard, MdOutlineSettings } from "react-icons/md";
+import { FaTableCells } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
@@ -19,13 +20,13 @@ function SideMenu({ children }) {
         { name: "Dashboard 3", link: "/dashboard-3" },
       ],
     },
+    { name: "ARP Table", icon: FaTableCells, link: "/arp" },
     {
       name: "Settings",
       icon: MdOutlineSettings,
       subItems: [
         { name: "Network Configuration", link: "/network-configuration" },
-        { name: "ARP Table", link:"#"},
-        { name: "Add Static ARP", link:"#"},
+        { name: "Add Static ARP", link:"/add-arp"},
         { name: "Delete ARP", link:"#"},
       ],
     },
