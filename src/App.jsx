@@ -24,6 +24,8 @@ function App() {
             <Route path="/home" element={<MainDashboard />} />
 
             <Route path="/network-configuration" element={<NetworkConfiguration />} />
+
+            <Route path="/arp" element={<ArpTable />} />
           </Routes>
         </div>
       </div>
