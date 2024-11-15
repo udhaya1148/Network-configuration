@@ -27,6 +27,8 @@ function App() {
             <Route path="/network-configuration" element={<NetworkConfiguration />} />
 
             <Route path="/arp" element={<ArpTable />} />
+
+            <Route path="/add-arp" element={<AddStaticArp />} />
           </Routes>
         </div>
       </div>
