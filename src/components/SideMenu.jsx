@@ -24,7 +24,7 @@ function SideMenu({ children }) {
       icon: MdOutlineSettings,
       subItems: [
         { name: "Network Configuration", link: "/network-configuration" },
-        { name: "Static ARP", link:"#"},
+        { name: "ARP Table", link:"#"},
         { name: "Add Static ARP", link:"#"},
         { name: "Delete ARP", link:"#"},
       ],
