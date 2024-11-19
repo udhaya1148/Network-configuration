@@ -139,7 +139,7 @@ def get_network_interfaces():
     return jsonify(interfaces)
 
 # API endpoint to add static ARP entry
-@app.route('/arp/static', methods=['POST'])
+@app.route('/static', methods=['POST'])
 def add_static_arp_entry():
     data = request.get_json()
     ip = data.get('ip')
@@ -154,7 +154,7 @@ def add_static_arp_entry():
     return jsonify({"error": "Missing required data (ip, mac)"}), 400
 
 # API endpoint to delete a static ARP entry
-@app.route('/arp/static', methods=['DELETE'])
+@app.route('/static', methods=['DELETE'])
 def delete_static_arp_entry():
     data = request.get_json()
     ip = data.get('ip')
