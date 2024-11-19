@@ -24,7 +24,7 @@ const ArpTable = () => {
   // useEffect for periodic data fetching
   useEffect(() => {
     fetchArpData();
-    const interval = setInterval(fetchArpData, 5000); // Refresh every 5 seconds
+    const interval = setInterval(fetchArpData, 2000); // Refresh every 5 seconds
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
