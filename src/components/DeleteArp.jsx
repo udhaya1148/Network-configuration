@@ -13,7 +13,7 @@ const DeleteArp = () => {
   // Function to fetch ARP data
   const fetchArpData = async () => {
     try {
-      const response = await fetch(`http://localhost:5002/api/arp`);
+      const response = await fetch(`/api2/arp`);
       if (!response.ok) {
         throw new Error("Failed to fetch ARP data");
       }
@@ -28,7 +28,7 @@ const DeleteArp = () => {
   // Function to fetch available network interfaces for the dropdown
   const fetchInterfaces = async () => {
     try {
-      const response = await fetch(`http://localhost:5002/api/interfaces`);
+      const response = await fetch(`/api2/interfaces`);
       if (!response.ok) {
         throw new Error("Failed to fetch interfaces");
       }
@@ -56,7 +56,7 @@ const DeleteArp = () => {
 
     const arpEntry = { ip };
     try {
-      const response = await fetch(`http://localhost:5002/api/arp/static`, {
+      const response = await fetch(`/api2/static`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
