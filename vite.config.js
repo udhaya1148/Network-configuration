@@ -1,21 +1,25 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
     proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
+      '/api1': {
+        target: 'http://localhost:5000', // Flask server URL
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/api1/, ''), // Correct path replacement for /api1
+      },
+      '/api2': {
+        target: 'http://localhost:8000', // Flask server URL
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api2/, ''), // Correct path replacement for /api2
       },
     },
   },
   preview: {
-    port: 5001, 
-    host: true,  
+    port: 5001,
+    host: true,
   },
-})
+});
