@@ -12,7 +12,7 @@ const AddStaticArp = () => {
 
   const fetchArpData = async () => {
     try {
-      const response = await fetch("http://localhost:5002/api/arp");
+      const response = await fetch("/api2/arp");
       if (!response.ok) {
         throw new Error("Failed to fetch ARP data");
       }
@@ -26,7 +26,7 @@ const AddStaticArp = () => {
 
   const fetchInterfaces = async () => {
     try {
-      const response = await fetch("http://localhost:5002/api/interfaces");
+      const response = await fetch("/api2/interfaces");
       if (!response.ok) {
         throw new Error("Failed to fetch interfaces");
       }
@@ -46,7 +46,7 @@ const AddStaticArp = () => {
 
     const arpEntry = { ip, mac };
     try {
-      const response = await fetch("http://localhost:5002/api/arp/static", {
+      const response = await fetch("/api2/arp/static", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
