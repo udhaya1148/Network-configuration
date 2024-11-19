@@ -53,7 +53,7 @@ function SideMenu({ children }) {
   };
 
   return (
-    <div className={`${open ? "w-72" : "w-20"} duration-300 h-screen bg-gray-300 p-5`}>
+    <div className={`${open ? "w-55" : "w-20"} duration-300 h-screen bg-gray-300 p-5`}>
       <div className="py-2 flex justify-end">
         <BsFillArrowLeftCircleFill size={30} className={`cursor-pointer ${!open && 'rotate-180'}`} onClick={toggleMenu} />
       </div>
