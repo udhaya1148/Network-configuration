@@ -18,8 +18,9 @@ const AddStaticArp = () => {
       }
       const data = await response.json();
       setArpData(data);
+      setError(null); // Clear any previous error
     } catch (error) {
-      setError(error.message);
+      setError("Failed to fetch ARP data. Backend might not be running.");
     }
   };
 
@@ -31,8 +32,9 @@ const AddStaticArp = () => {
       }
       const data = await response.json();
       setInterfaces(data);
+      setError(null); // Clear any previous error
     } catch (error) {
-      setError(error.message);
+      setError("Failed to fetch interfaces. Backend might not be running.");
     }
   };
 
@@ -111,23 +113,20 @@ const AddStaticArp = () => {
     setMac(rawMac);
   };
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
   return (
     <div className="flex flex-row h-screen w-screen">
+      {/* Always show SideMenu */}
       <SideMenu />
       <div className="flex-grow p-6 overflow-auto mt-4 justify-center">
+        {/* Show error message for backend issues */}
+        {error && <div className="text-red-500 mb-4">{error}</div>}
+
+        {/* ARP Table */}
         <div className="border border-gray-500 mb-2 p-6 bg-white rounded-lg shadow-lg">
           <h3 className="text-blue-600 text-3xl font-bold">ARP Table</h3>
-          <div className="flex items-center justify-between mt-4">
-            <div className="font-bold flex-1">IP Address</div>
-            <div className="font-bold flex-1">Hardware Type</div>
-            <div className="font-bold flex-1">MAC Address</div>
-            <div className="font-bold flex-1">Flags</div>
-            <div className="font-bold flex-1">Interface</div>
-          </div>
+          {arpData.length === 0 && (
+            <div className="text-gray-500 mt-4">No ARP data available.</div>
+          )}
           {arpData.map((entry, index) => (
             <div
               key={index}
@@ -145,12 +144,6 @@ const AddStaticArp = () => {
         {/* Form for adding static ARP entry */}
         <div className="border border-gray-500 p-4 bg-white rounded-lg shadow-lg mt-6">
           <h4 className="text-xl text-blue-600 font-bold mb-2">Add Static ARP</h4>
-
-          {/* Error Display */}
-          {error && <div className="text-red-500 mb-4">{error}</div>}
-
-          {/* Success Message Display */}
-          {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
 
           <div className="mb-4">
             <label className="block font-bold">IP Address</label>
