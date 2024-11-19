@@ -3,77 +3,48 @@ import SideMenu from "./SideMenu";
 
 const DeleteArp = () => {
   const [arpData, setArpData] = useState([]);
-  const [error, setError] = useState(null);
-  const [ip, setIp] = useState("");
-  const [mac, setMac] = useState(""); // Added MAC address state for adding entries
-  const [iface, setIface] = useState("");
   const [interfaces, setInterfaces] = useState([]);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [ip, setIp] = useState("");
   const [ipError, setIpError] = useState(""); // Track IP error state
-  const [macError, setMacError] = useState(""); // Track MAC error state
 
+  
   // Function to fetch ARP data
   const fetchArpData = async () => {
     try {
-      const response = await fetch("http://172.18.1.224:8000/api/arp");
+      const response = await fetch(`http://172.18.1.251:8000/api/arp`);
       if (!response.ok) {
         throw new Error("Failed to fetch ARP data");
       }
       const data = await response.json();
       setArpData(data);
     } catch (error) {
-      setError(error.message);
+      console.error("Error fetching ARP data:", error);
+      setError("Failed to load ARP data.");
     }
   };
 
-  // Function to fetch available network interfaces for the select dropdown
+  // Function to fetch available network interfaces for the dropdown
   const fetchInterfaces = async () => {
     try {
-      const response = await fetch("http://172.18.1.224:8000/api/interfaces");
+      const response = await fetch(`http://172.18.1.251:8000/api/interfaces`);
       if (!response.ok) {
         throw new Error("Failed to fetch interfaces");
       }
       const data = await response.json();
       setInterfaces(data);
     } catch (error) {
-      setError(error.message);
+      console.error("Error fetching interfaces:", error);
+      setError("Failed to load interfaces.");
     }
   };
 
-  // Function to handle adding a static ARP entry
-  const handleAddStaticArp = async () => {
-    if (!isValidIp(ip)) {
-      setIpError("Invalid IP address format.");
-      return;
-    }
-
-    if (!isValidMac(mac)) {
-      setMacError("Invalid MAC address format.");
-      return;
-    }
-
-    const arpEntry = { ip, mac, iface };
-    try {
-      const response = await fetch("http://172.18.1.224:8000/api/arp/static", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(arpEntry),
-      });
-      const result = await response.json();
-      if (response.ok) {
-        alert("Static ARP entry added successfully!");
-        fetchArpData(); // Refresh the ARP table after adding entry
-        // Clear input fields
-        setIp("");
-        setMac("");
-        setIface("");
-      } else {
-        alert(`Error: ${result.error}`);
-      }
-    } catch (error) {
-      alert(`Error: ${error.message}`);
-    }
+  // Function to validate IP address
+  const isValidIp = (ipAddress) => {
+    const regex =
+      /^(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)$/;
+    return regex.test(ipAddress);
   };
 
   // Function to handle deleting a static ARP entry
@@ -83,9 +54,9 @@ const DeleteArp = () => {
       return;
     }
 
-    const arpEntry = { ip, iface };
+    const arpEntry = { ip };
     try {
-      const response = await fetch("http://172.18.1.224:8000/api/arp/static", {
+      const response = await fetch(`http://172.18.1.251:8000/api/arp/static`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -95,11 +66,10 @@ const DeleteArp = () => {
 
       const result = await response.json();
       if (response.ok) {
-        alert("Static ARP entry deleted successfully!");
+        setSuccessMessage("Static ARP entry deleted successfully!");
+        setTimeout(() => setSuccessMessage(""), 3000); // Clear message after 3 seconds
         fetchArpData(); // Refresh the ARP table after deleting entry
-        // Clear input fields
-        setIp("");
-        setIface("");
+        setIp(""); // Clear input field
       } else {
         alert(`Error: ${result.error}`);
       }
@@ -108,26 +78,7 @@ const DeleteArp = () => {
     }
   };
 
-  // Function to validate IP address
-  const isValidIp = (ipAddress) => {
-    const regex = /^(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)$/;
-    return regex.test(ipAddress);
-  };
-
-  // Function to validate MAC address
-  const isValidMac = (macAddress) => {
-    const regex = /^([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2})$/;
-    return regex.test(macAddress);
-  };
-
-  useEffect(() => {
-    fetchArpData();
-    fetchInterfaces();
-    const interval = setInterval(fetchArpData, 5000); // Refresh every 5 seconds
-    return () => clearInterval(interval);
-  }, []);
-
-  // Handle IP address input without dots
+  // Handle IP address input
   const handleIpChange = (e) => {
     const value = e.target.value.replace(/[^0-9.]/g, ""); // Allow only numbers and dots
     setIp(value);
@@ -136,23 +87,23 @@ const DeleteArp = () => {
     }
   };
 
-  // Handle MAC address input
-  const handleMacChange = (e) => {
-    const value = e.target.value.toLowerCase();
-    setMac(value);
-    if (isValidMac(value)) {
-      setMacError(""); // Clear error if MAC is valid
-    }
-  };
-
-  if (error) {
-    return <div className="text-red-500">Error: {error}</div>;
-  }
+  useEffect(() => {
+    fetchArpData();
+    fetchInterfaces();
+    const intervalId = setInterval(fetchArpData, 4000); // Refresh every 4 seconds
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <div className="flex flex-row h-screen w-screen">
       <SideMenu />
       <div className="flex-grow p-6 overflow-auto mt-4 justify-center">
+        {/* Error Display */}
+        {error && <div className="text-red-500 mb-4">{error}</div>}
+
+        {/* Success Message Display */}
+        {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
+
         {/* ARP Table Display */}
         <div className="border border-gray-500 mb-4 p-6 bg-white rounded-lg shadow-lg">
           <h3 className="text-blue-600 text-3xl font-bold">ARP Table</h3>
@@ -163,8 +114,10 @@ const DeleteArp = () => {
             <div className="font-bold flex-1">Flags</div>
             <div className="font-bold flex-1">Interface</div>
           </div>
-          {arpData.length === 0 && (
-            <div className="text-center text-gray-500 mt-4">No ARP entries found.</div>
+          {arpData?.length === 0 && (
+            <div className="text-center text-gray-500 mt-4">
+              No ARP entries found.
+            </div>
           )}
           {arpData.map((entry, index) => (
             <div
@@ -180,25 +133,12 @@ const DeleteArp = () => {
           ))}
         </div>
 
-
         {/* Form for Deleting Static ARP Entry */}
         <div className="border border-gray-500 p-4 bg-white rounded-lg shadow-lg">
-          <h4 className="text-xl text-red-600 font-bold mb-2">Delete Static ARP</h4>
-          <div className="mb-4">
-            <label className="block font-bold">Interface</label>
-            <select
-              value={iface}
-              onChange={(e) => setIface(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg"
-            >
-              <option value="">Select Interface</option>
-              {interfaces.map((interfaceItem, index) => (
-                <option key={index} value={interfaceItem}>
-                  {interfaceItem}
-                </option>
-              ))}
-            </select>
-          </div>
+          <h4 className="text-xl text-red-600 font-bold mb-2">
+            Delete Static ARP
+          </h4>
+
           <div className="mb-4">
             <label className="block font-bold">IP Address</label>
             <input
