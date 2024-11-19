@@ -12,7 +12,7 @@ function NetworkConfiguration() {
 
   useEffect(() => {
     fetchNetworkInfo();
-    const interval = setInterval(fetchNetworkInfo, 5000);
+    const interval = setInterval(fetchNetworkInfo, 2000);
 
     return () => clearInterval(interval);
   }, []);
