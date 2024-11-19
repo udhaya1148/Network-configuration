@@ -18,7 +18,7 @@ function NetworkConfiguration() {
   }, []);
 
   const fetchNetworkInfo = () => {
-    fetch(`/api2/network-info?ts=${new Date().getTime()}`)
+    fetch(`/api1/network-info?ts=${new Date().getTime()}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.network_info) {
@@ -53,7 +53,7 @@ function NetworkConfiguration() {
       dhcp: dhcpEnabled === "DHCP",
     };
 
-    fetch("/api2/update-network", {
+    fetch("/api1/update-network", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
