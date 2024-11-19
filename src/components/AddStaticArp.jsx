@@ -20,7 +20,7 @@ const AddStaticArp = () => {
       setArpData(data);
       setError(null); // Clear any previous error
     } catch (error) {
-      setError("Failed to fetch ARP data. Backend might not be running.");
+      setError("Failed to fetch ARP data.");
     }
   };
 
