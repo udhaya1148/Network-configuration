@@ -46,7 +46,7 @@ const AddStaticArp = () => {
 
     const arpEntry = { ip, mac };
     try {
-      const response = await fetch("/api2/arp/static", {
+      const response = await fetch("/api2/static", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
