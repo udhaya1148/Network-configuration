@@ -2,6 +2,7 @@ import subprocess
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import os
+import sys
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -57,10 +58,10 @@ def get_interfaces():
         return {'error': str(e)}
 
 # Add static ARP entry
-def add_static_arp(ip, mac, iface):
+def add_static_arp(ip, mac):
     try:
         # Static ARP entry command
-        arp_entry = f"arp -s {ip} {mac} -i {iface}\n"
+        arp_entry = f"arp -s {ip} {mac}\n"
         
         # Check if the ARP entry already exists in the script
         if os.path.exists(ARP_FILE_PATH):
@@ -87,7 +88,7 @@ def add_static_arp(ip, mac, iface):
         return {"error": f"Failed to add ARP entry: {str(e)}"}
 
 # Delete static ARP entry
-def delete_static_arp(ip, iface):
+def delete_static_arp(ip):
     try:
         if not os.path.exists(ARP_FILE_PATH):
             return {"error": "ARP file does not exist."}
@@ -98,7 +99,7 @@ def delete_static_arp(ip, iface):
         # Corrected the condition to ensure both IP and iface match
         updated_lines = [
             line for line in lines 
-            if not (line.startswith(f"arp -s {ip} ") and f"-i {iface}" in line)
+            if not (line.startswith(f"arp -s {ip} "))
         ]
 
         if len(lines) == len(updated_lines):
@@ -109,7 +110,7 @@ def delete_static_arp(ip, iface):
             file.writelines(updated_lines)
 
         # Execute the command to delete the ARP entry from the system
-        delete_command = ['sudo', 'arp', '-d', ip, '-i', iface]
+        delete_command = ['sudo', 'arp', '-d', ip]
         subprocess.run(delete_command, check=True)
 
         # Execute the script immediately to apply changes
@@ -122,7 +123,7 @@ def delete_static_arp(ip, iface):
         return {"error": f"Failed to delete ARP entry: {str(e)}"}
 
 # API endpoint to get ARP table
-@app.route('/api/arp', methods=['GET'])
+@app.route('/arp', methods=['GET'])
 def get_arp_table():
     arp_data = get_arp_data()
     if 'error' in arp_data:
@@ -130,7 +131,7 @@ def get_arp_table():
     return jsonify(arp_data)
 
 # API endpoint to get network interfaces
-@app.route('/api/interfaces', methods=['GET'])
+@app.route('/interfaces', methods=['GET'])
 def get_network_interfaces():
     interfaces = get_interfaces()
     if 'error' in interfaces:
@@ -138,37 +139,41 @@ def get_network_interfaces():
     return jsonify(interfaces)
 
 # API endpoint to add static ARP entry
-@app.route('/api/arp/static', methods=['POST'])
+@app.route('/static', methods=['POST'])
 def add_static_arp_entry():
     data = request.get_json()
     ip = data.get('ip')
     mac = data.get('mac')
-    iface = data.get('iface')  # Assuming 'iface' is also provided by the frontend
 
-    if ip and mac and iface:
-        result = add_static_arp(ip, mac, iface)
+
+    if ip and mac :
+        result = add_static_arp(ip, mac)
         if 'error' in result:
             return jsonify(result), 500
         return jsonify(result)
-    return jsonify({"error": "Missing required data (ip, mac, iface)"}), 400
+    return jsonify({"error": "Missing required data (ip, mac)"}), 400
 
 # API endpoint to delete a static ARP entry
-@app.route('/api/arp/static', methods=['DELETE'])
+@app.route('/static', methods=['DELETE'])
 def delete_static_arp_entry():
     data = request.get_json()
     ip = data.get('ip')
-    iface = data.get('iface')
 
-    if ip and iface:
-        result = delete_static_arp(ip, iface)
+    if ip :
+        result = delete_static_arp(ip)
         if 'error' in result:
             return jsonify(result), 500
         return jsonify(result)
-    return jsonify({"error": "Missing required data (ip, iface)"}), 400
+    return jsonify({"error": "Missing required data (ip)"}), 400
 
 if __name__ == '__main__':
     # Ensure the ARP file exists and is executable
     if not os.path.exists(ARP_FILE_PATH):
         open(ARP_FILE_PATH, 'a').close()
         os.chmod(ARP_FILE_PATH, 0o755)
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    
+    # Get the current filename dynamically
+    current_file = os.path.basename(__file__)  # Get the filename of the current script
+
+    # Run gunicorn programmatically using subprocess
+    subprocess.run(['gunicorn', '-w', '4', '-b', '0.0.0.0:5002', current_file[:-3] + ':app'])
