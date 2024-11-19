@@ -29,6 +29,8 @@ function App() {
             <Route path="/arp" element={<ArpTable />} />
 
             <Route path="/add-arp" element={<AddStaticArp />} />
+
+            <Route path="/delete-arp" element={<DeleteArp />} />
           </Routes>
         </div>
       </div>
