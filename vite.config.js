@@ -12,14 +12,14 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api1/, ''), // Correct path replacement for /api1
       },
       '/api2': {
-        target: 'http://localhost:8000', // Flask server URL
+        target: 'http://localhost:5001', // Flask server URL
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api2/, ''), // Correct path replacement for /api2
       },
     },
   },
   preview: {
-    port: 5001,
+    port: 5002,
     host: true,
   },
 });
