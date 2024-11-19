@@ -1,4 +1,4 @@
-sudo cp -i /home/netcon/netplan/Network-configuration/PythonScript/Network-configuration.py /bin
+sudo cp -i /home/netcon/Network-configuration/PythonScript/Network-configuration.py /bin
 sudo crontab -e
 @reboot /usr/bin/python3 /bin/Network-configuration.py
 sudo chmod +x /bin/Network-configuration.py
