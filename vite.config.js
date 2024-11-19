@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     host: true,
     proxy: {
-      '/api1/arp': {
+      '/api1': {
         target: 'http://localhost:5001', // Flask server URL
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api1/, '')
