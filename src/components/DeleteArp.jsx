@@ -90,7 +90,7 @@ const DeleteArp = () => {
   useEffect(() => {
     fetchArpData();
     fetchInterfaces();
-    const intervalId = setInterval(fetchArpData, 4000); // Refresh every 4 seconds
+    const intervalId = setInterval(fetchArpData, 2000); // Refresh every 4 seconds
     return () => clearInterval(intervalId);
   }, []);
 
