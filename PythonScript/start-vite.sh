@@ -2,7 +2,7 @@
 #!/bin/bash
 
 # Navigate to your project directory
-cd /home/netcon/netplan/Network-configuration/PythonScript
+cd /home/netcon/Network-configuration/
 
 # Build the project
 npm run build
