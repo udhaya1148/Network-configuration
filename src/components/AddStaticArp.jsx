@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
 import SideMenu from "./SideMenu";
 
-const ArpTable = () => {
+const AddStaticArp = () => {
   const [arpData, setArpData] = useState([]);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [ip, setIp] = useState("");
-  const [mac, setMac] = useState(""); // Store raw MAC address without colons
-  const [iface, setIface] = useState("");
+  const [mac, setMac] = useState("");
   const [interfaces, setInterfaces] = useState([]);
-  const [ipError, setIpError] = useState(""); // Track IP error state
+  const [ipError, setIpError] = useState("");
 
-  // Function to fetch ARP data
   const fetchArpData = async () => {
     try {
-      const response = await fetch("http://172.18.1.224:8000/api/arp");
+      const response = await fetch("http://172.18.1.251:8000/api/arp");
       if (!response.ok) {
         throw new Error("Failed to fetch ARP data");
       }
@@ -24,10 +23,9 @@ const ArpTable = () => {
     }
   };
 
-  // Function to fetch available network interfaces for the select dropdown
   const fetchInterfaces = async () => {
     try {
-      const response = await fetch("http://172.18.1.224:8000/api/interfaces");
+      const response = await fetch("http://172.18.1.251:8000/api/interfaces");
       if (!response.ok) {
         throw new Error("Failed to fetch interfaces");
       }
@@ -38,16 +36,15 @@ const ArpTable = () => {
     }
   };
 
-  // Function to handle adding a static ARP entry
   const handleAddStaticArp = async () => {
     if (!isValidIp(ip)) {
       setIpError("Invalid IP address format.");
       return;
     }
 
-    const arpEntry = { ip, mac, iface };
+    const arpEntry = { ip, mac };
     try {
-      const response = await fetch("http://172.18.1.224:8000/api/arp/static", {
+      const response = await fetch("http://172.18.1.251:8000/api/arp/static", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,56 +53,62 @@ const ArpTable = () => {
       });
       const result = await response.json();
       if (response.ok) {
-        alert("Static ARP entry added successfully!");
-        fetchArpData(); // Refresh the ARP table after adding entry
-
-        // Clear input fields after successful addition
+        setSuccessMessage("Static ARP entry added successfully!");
+        setError(null);
+        fetchArpData();
         setIp("");
         setMac("");
-        setIface("");
-        setIpError(""); // Clear any IP error messages
+        setIpError("");
       } else {
-        alert(`Error: ${result.error}`);
+        setSuccessMessage(null);
+        setError(result.error || "Failed to add ARP entry.");
       }
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      setSuccessMessage(null);
+      setError(error.message);
     }
   };
 
-  // Function to validate IP address
   const isValidIp = (ipAddress) => {
-    const regex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-    return regex.test(ipAddress);
+    const segments = ipAddress.split(".");
+    if (segments.length !== 4) return false;
+
+    return segments.every((segment) => {
+      if (!/^\d+$/.test(segment)) return false; // Check if segment is a number
+      const num = parseInt(segment, 10);
+      if (num < 0 || num > 255) return false; // Check range
+      if (segment.length > 1 && segment.startsWith("0")) return false; // Prevent leading zeros
+      return true;
+    });
   };
 
   useEffect(() => {
     fetchArpData();
     fetchInterfaces();
-    const interval = setInterval(fetchArpData, 5000); // Refresh every 5 seconds
+    const interval = setInterval(fetchArpData, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // Handle IP address input without dots
   const handleIpChange = (e) => {
     const value = e.target.value.replace(/[^0-9.]/g, ""); // Allow only numbers and dots
     setIp(value);
     if (isValidIp(value)) {
       setIpError(""); // Clear error if IP is valid
+    } else {
+      setIpError("Invalid IP address format."); // Set error message if invalid
     }
   };
 
-  // Function to format MAC address for display with colons
   const formatMacForDisplay = (macAddress) => {
     return macAddress
-      .replace(/[^a-fA-F0-9]/g, "") // Only keep hexadecimal characters
-      .slice(0, 12) // Limit to 12 characters (6 pairs of hex)
-      .replace(/(.{2})(?=.)/g, "$1:"); // Insert colons every two characters
+      .replace(/[^a-fA-F0-9]/g, "")
+      .slice(0, 12)
+      .replace(/(.{2})(?=.)/g, "$1:");
   };
 
-  // Handle MAC address input (remove colons for internal state)
   const handleMacChange = (e) => {
-    const rawMac = e.target.value.replace(/[^a-fA-F0-9]/g, ""); // Remove non-hex characters
-    setMac(rawMac); // Update state with raw MAC address (without colons)
+    const rawMac = e.target.value.replace(/[^a-fA-F0-9]/g, "");
+    setMac(rawMac);
   };
 
   if (error) {
@@ -142,21 +145,13 @@ const ArpTable = () => {
         {/* Form for adding static ARP entry */}
         <div className="border border-gray-500 p-4 bg-white rounded-lg shadow-lg mt-6">
           <h4 className="text-xl text-blue-600 font-bold mb-2">Add Static ARP</h4>
-          <div className="mb-4">
-            <label className="block font-bold">Interface</label>
-            <select
-              value={iface}
-              onChange={(e) => setIface(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg"
-            >
-              <option value="">Select Interface</option>
-              {interfaces.map((interfaceItem, index) => (
-                <option key={index} value={interfaceItem}>
-                  {interfaceItem}
-                </option>
-              ))}
-            </select>
-          </div>
+
+          {/* Error Display */}
+          {error && <div className="text-red-500 mb-4">{error}</div>}
+
+          {/* Success Message Display */}
+          {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
+
           <div className="mb-4">
             <label className="block font-bold">IP Address</label>
             <input
@@ -172,7 +167,7 @@ const ArpTable = () => {
             <label className="block font-bold">MAC Address</label>
             <input
               type="text"
-              value={formatMacForDisplay(mac)} // Format for display with colons
+              value={formatMacForDisplay(mac)}
               onChange={handleMacChange}
               placeholder="e.g., AABBCCDDEEFF"
               className="w-full p-2 border border-gray-300 rounded-lg"
@@ -191,4 +186,4 @@ const ArpTable = () => {
   );
 };
 
-export default ArpTable;
+export default AddStaticArp;
