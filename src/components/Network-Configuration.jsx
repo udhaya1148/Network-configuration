@@ -18,7 +18,7 @@ function NetworkConfiguration() {
   }, []);
 
   const fetchNetworkInfo = () => {
-    fetch(`/api1/network-info?ts=${new Date().getTime()}`)
+    fetch(`/http://localhost:5001/network-info?ts=${new Date().getTime()}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.network_info) {
