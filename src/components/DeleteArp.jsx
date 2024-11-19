@@ -180,54 +180,6 @@ const DeleteArp = () => {
           ))}
         </div>
 
-        {/* Form for Adding Static ARP Entry */}
-        <div className="border border-gray-500 p-4 bg-white rounded-lg shadow-lg mb-6">
-          <h4 className="text-xl text-green-600 font-bold mb-2">Add Static ARP</h4>
-          <div className="mb-4">
-            <label className="block font-bold">Interface</label>
-            <select
-              value={iface}
-              onChange={(e) => setIface(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg"
-            >
-              <option value="">Select Interface</option>
-              {interfaces.map((interfaceItem, index) => (
-                <option key={index} value={interfaceItem}>
-                  {interfaceItem}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block font-bold">IP Address</label>
-            <input
-              type="text"
-              value={ip}
-              onChange={handleIpChange}
-              placeholder="e.g., 192.168.0.1"
-              className="w-full p-2 border border-gray-300 rounded-lg"
-            />
-            {ipError && <div className="text-red-500 text-sm">{ipError}</div>}
-          </div>
-          <div className="mb-4">
-            <label className="block font-bold">MAC Address</label>
-            <input
-              type="text"
-              value={mac}
-              onChange={handleMacChange}
-              placeholder="e.g., aa:bb:cc:dd:ee:ff"
-              className="w-full p-2 border border-gray-300 rounded-lg"
-            />
-            {macError && <div className="text-red-500 text-sm">{macError}</div>}
-          </div>
-
-          <button
-            onClick={handleAddStaticArp}
-            className="bg-green-600 text-white rounded-lg p-2 mt-2"
-          >
-            Add ARP Entry
-          </button>
-        </div>
 
         {/* Form for Deleting Static ARP Entry */}
         <div className="border border-gray-500 p-4 bg-white rounded-lg shadow-lg">
@@ -272,4 +224,3 @@ const DeleteArp = () => {
 };
 
 export default DeleteArp;
-
