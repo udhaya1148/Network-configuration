@@ -10,24 +10,24 @@ import glob
 import sys
 
 # Check if Gunicorn is installed; if not, install it using apt
-def check_and_install_gunicorn():
-    try:
-        # Attempt to check Gunicorn installation
-        subprocess.check_call(['gunicorn', '--version'])
-        print("Gunicorn is already installed.")
-    except FileNotFoundError:
-        # Gunicorn not found, install using apt
-        print("Gunicorn is not installed. Installing Gunicorn using apt...")
-        try:
-            subprocess.check_call(['sudo', 'apt', 'update'])
-            subprocess.check_call(['sudo', 'apt', 'install', '-y', 'gunicorn'])
-            print("Gunicorn installed successfully.")
-        except subprocess.CalledProcessError as e:
-            print(f"Failed to install Gunicorn: {e}")
-            sys.exit(1)
+# def check_and_install_gunicorn():
+#     try:
+#         # Attempt to check Gunicorn installation
+#         subprocess.check_call(['gunicorn', '--version'])
+#         print("Gunicorn is already installed.")
+#     except FileNotFoundError:
+#         # Gunicorn not found, install using apt
+#         print("Gunicorn is not installed. Installing Gunicorn using apt...")
+#         try:
+#             subprocess.check_call(['sudo', 'apt', 'update'])
+#             subprocess.check_call(['sudo', 'apt', 'install', '-y', 'gunicorn'])
+#             print("Gunicorn installed successfully.")
+#         except subprocess.CalledProcessError as e:
+#             print(f"Failed to install Gunicorn: {e}")
+#             sys.exit(1)
 
-# Install Gunicorn if necessary
-check_and_install_gunicorn()
+# # Install Gunicorn if necessary
+# check_and_install_gunicorn()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
