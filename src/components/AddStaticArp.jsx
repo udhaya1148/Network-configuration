@@ -87,7 +87,7 @@ const AddStaticArp = () => {
   useEffect(() => {
     fetchArpData();
     fetchInterfaces();
-    const interval = setInterval(fetchArpData, 5000);
+    const interval = setInterval(fetchArpData, 2000);
     return () => clearInterval(interval);
   }, []);
 
