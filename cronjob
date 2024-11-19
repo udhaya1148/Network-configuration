@@ -14,4 +14,4 @@ sudo chmod +x /bin/arp-pythonscript.py
 
 # react
 @reboot /home/netcon/Network-configuration/PythonScript/start-vite.sh
-chmod +x /home/netcon/Network-configuration/PythonScript/start-vite.sh
+sudo chmod +x /home/netcon/Network-configuration/PythonScript/start-vite.sh
