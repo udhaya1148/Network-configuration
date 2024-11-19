@@ -6,15 +6,15 @@ export default defineConfig({
   server: {
     host: true,
     proxy: {
-      '/api1': {
+      '/api1/arp': {
         target: 'http://localhost:5001', // Flask server URL
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api1/, ''), // Correct path replacement for /api1
+        rewrite: (path) => path.replace(/^\/api1\/arp/, ''), // Correct path replacement for /api1
       },
       '/api2': {
         target: 'http://localhost:5002', // Flask server URL
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api2/, ''), // Correct path replacement for /api2
+        rewrite: (path) => path.replace(/^\/api2\/arp/, ''), // Correct path replacement for /api2
       },
     },
   },
