@@ -35,6 +35,14 @@ This project is a web-based utility built with React.js and Flask to display and
   ```
   sudo apt install -y gunicorn
   ```
+
+  # Install Nodejs
+  ```
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+  ```
+  ```
+  nvm install 22
+  ``` 
   # Install dependencies for react
   ```
   cd Network-configuration
