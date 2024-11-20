@@ -24,17 +24,25 @@ This project is a web-based utility built with React.js and Flask to display and
   # Install dependencies for python
   ```
   sudo apt install python3-flask-cors
+  ```
+  ```
   sudo apt install python3-psutil
   ```
   # Install dependencies for react
   ```
   sudo apt install npm
+  ```
+  ```
   npm install react-router-dom
+  ```
+  ```
   npm install react-icons --save
   ```
 # Install TailwindCsss
 ```
 npm install -D tailwindcss postcss autoprefixer
+```
+```
 npx tailwindcss init -p
 ```
 # Tailwindcss config.js
