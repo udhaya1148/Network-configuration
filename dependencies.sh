@@ -6,11 +6,11 @@ sudo apt update
 sudo apt install -y gunicorn
 
 # Install Dependencies  for flask
-sudo apt install python3-flask-cors
-sudo apt install python3-psutil
+sudo apt install -y python3-flask-cors
+sudo apt install -y python3-psutil
 
 # Install Dependencies for vite-react
-sudo apt install npm
+sudo apt install -y npm
 npm install react-router-dom
 npm install react-icons --save
 
