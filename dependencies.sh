@@ -2,6 +2,7 @@
 
 sudo apt update
 
+
 # Install Gunicorn
 sudo apt install -y gunicorn
 
@@ -9,7 +10,10 @@ sudo apt install -y gunicorn
 sudo apt install -y python3-flask-cors
 sudo apt install -y python3-psutil
 
+
 # Install Dependencies for vite-react
+sudo apt install nodejs
+
 sudo apt install -y npm
 npm install react-router-dom
 npm install react-icons --save
