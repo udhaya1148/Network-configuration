@@ -18,6 +18,9 @@ This project is a web-based utility built with React.js and Flask to display and
   sudo chmod +x /home/netcon/Network-configuration/dependencies.sh
   ```
   ```
+  cd Network-configuration
+  ```
+  ```
   ./dependencies.sh
   ```
   
