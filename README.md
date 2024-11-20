@@ -38,17 +38,17 @@ This project is a web-based utility built with React.js and Flask to display and
 
   # Install Nodejs
   ```
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+  curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
   ```
   ```
-  nvm install 22
+  sudo apt-get install nodejs -y
   ``` 
   # Install dependencies for react
   ```
   cd Network-configuration
   ```
   ```
-  sudo apt install npm
+  install npm
   ```
   ```
   npm install react-router-dom
