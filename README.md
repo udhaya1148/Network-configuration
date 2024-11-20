@@ -37,6 +37,9 @@ This project is a web-based utility built with React.js and Flask to display and
   ```
   # Install dependencies for react
   ```
+  cd Network-configuration
+  ```
+  ```
   sudo apt install npm
   ```
   ```
