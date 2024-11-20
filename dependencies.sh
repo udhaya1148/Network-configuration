@@ -12,7 +12,8 @@ sudo apt install -y python3-psutil
 
 
 # Install Dependencies for vite-react
-sudo apt install nodejs
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+nvm install 22
 
 sudo apt install -y npm
 npm install react-router-dom
