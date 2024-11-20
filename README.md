@@ -28,6 +28,10 @@ This project is a web-based utility built with React.js and Flask to display and
   ```
   sudo apt install python3-psutil
   ```
+  # Install Gunicorn
+  ```
+  sudo apt install -y gunicorn
+  ```
   # Install dependencies for react
   ```
   sudo apt install npm
