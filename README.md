@@ -16,6 +16,8 @@ This project is a web-based utility built with React.js and Flask to display and
   # Install full dependencies
   ```
   sudo chmod +x /home/netcon/Network-configuration/dependencies.sh
+  ```
+  ```
   ./dependencies.sh
   ```
   
