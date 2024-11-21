@@ -147,5 +147,15 @@ def update_network():
 
     return jsonify({'status': 'success'})
 
+# Dynamically get the filename and start Gunicorn if the script is executed directly
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    # Get the script filename
+    script_filename = os.path.basename(__file__)
+
+    # Use subprocess to call gunicorn dynamically
+    subprocess.run([
+        'gunicorn',
+        '-w', '4',          # Number of worker processes
+        '-b', '0.0.0.0:5001', # Bind to 0.0.0.0:5001
+        script_filename.replace('.py', ':app')  # Dynamically pass the app name
+    ])
