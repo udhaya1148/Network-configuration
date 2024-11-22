@@ -115,14 +115,13 @@ const AddStaticArp = () => {
 
   return (
     <div className="flex flex-row h-screen w-screen">
-      {/* Always show SideMenu */}
       <SideMenu />
       <div className="flex-grow p-6 overflow-auto mt-4 justify-center">
-        {/* Show error message for backend issues */}
+        {/* Error Message */}
         {error && <div className="text-red-500 mb-4">{error}</div>}
 
         {/* ARP Table */}
-        <div className="border border-gray-500 mb-2 p-6 bg-white rounded-lg shadow-lg">
+        <div className="border border-gray-300 mb-4 p-6 bg-white rounded-lg shadow-lg">
           <h3 className="text-blue-600 text-3xl font-bold">ARP Table</h3>
           {arpData.length === 0 && (
             <div className="text-gray-500 mt-4">No ARP data available.</div>
@@ -130,23 +129,30 @@ const AddStaticArp = () => {
           {arpData.map((entry, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-2 bg-gray-200 rounded-lg p-4 mt-2 mb-2"
+              className="flex items-center justify-between p-2 bg-gray-200 rounded-lg mt-2"
             >
-              <div className="flex-1">{entry.ip}</div>
-              <div className="flex-1">{entry.hw_type}</div>
-              <div className="flex-1">{entry.mac}</div>
-              <div className="flex-1">{entry.flags}</div>
-              <div className="flex-1">{entry.iface}</div>
+              <div className="flex-1 text-gray-700">{entry.ip}</div>
+              <div className="flex-1 text-gray-700">{entry.hw_type}</div>
+              <div className="flex-1 text-gray-700">{entry.mac}</div>
+              <div className="flex-1 text-gray-700">{entry.flags}</div>
+              <div className="flex-1 text-gray-700">{entry.iface}</div>
             </div>
           ))}
         </div>
 
-        {/* Form for adding static ARP entry */}
-        <div className="border border-gray-500 p-4 bg-white rounded-lg shadow-lg mt-6">
-          <h4 className="text-xl text-blue-600 font-bold mb-2">Add Static ARP</h4>
+        {/* Form for Adding Static ARP Entry */}
+        <div className="border border-gray-300 p-6 bg-white rounded-lg shadow-lg">
+          <h4 className="text-xl text-blue-600 font-bold mb-4">Add Static ARP</h4>
+
+          {/* Success Message */}
+          {successMessage && (
+            <div className="text-green-500 text-sm mb-4">{successMessage}</div>
+          )}
 
           <div className="mb-4">
-            <label className="block font-bold">IP Address</label>
+            <label className="block text-gray-700 font-bold mb-2">
+              IP Address
+            </label>
             <input
               type="text"
               value={ip}
@@ -156,8 +162,11 @@ const AddStaticArp = () => {
             />
             {ipError && <div className="text-red-500 text-sm">{ipError}</div>}
           </div>
+
           <div className="mb-4">
-            <label className="block font-bold">MAC Address</label>
+            <label className="block text-gray-700 font-bold mb-2">
+              MAC Address
+            </label>
             <input
               type="text"
               value={formatMacForDisplay(mac)}
@@ -169,7 +178,7 @@ const AddStaticArp = () => {
 
           <button
             onClick={handleAddStaticArp}
-            className="bg-blue-600 text-white rounded-lg p-2"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
           >
             Add Static ARP
           </button>
