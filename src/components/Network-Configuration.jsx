@@ -12,44 +12,24 @@ function NetworkConfiguration() {
 
   useEffect(() => {
     fetchNetworkInfo();
-    const interval = setInterval(fetchNetworkInfo, 2000);
-
+    const interval = setInterval(fetchNetworkInfo, 5000);
     return () => clearInterval(interval);
   }, []);
 
   const fetchNetworkInfo = () => {
     fetch(`/api1/network-info?ts=${new Date().getTime()}`)
       .then((response) => response.json())
-      .then((data) => {
-        if (data.network_info) {
-          setNetworkInfo(data.network_info);
-        } else {
-          console.error("Network info not found in response.");
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching network data:", error);
-      });
+      .then((data) => setNetworkInfo(data.network_info))
+      .catch((error) => console.error("Error fetching network info:", error));
   };
 
   const handleUpdate = () => {
-    if (
-      !selectedInterface ||
-      (dhcpEnabled === "Manual" && (!ip || !subnet || !gateway || !dns))
-    ) {
-      alert("Please fill in all fields.");
-      return;
-    }
-
     const payload = {
       interface: selectedInterface,
       ip: dhcpEnabled === "DHCP" ? "" : ip,
       subnet: dhcpEnabled === "DHCP" ? "" : subnet,
       gateway: dhcpEnabled === "DHCP" ? "" : gateway,
-      dns:
-        dhcpEnabled === "DHCP"
-          ? []
-          : dns.split(",").map((server) => server.trim()),
+      dns: dhcpEnabled === "DHCP" ? [] : dns.split(",").map((d) => d.trim()),
       dhcp: dhcpEnabled === "DHCP",
     };
 
@@ -64,14 +44,11 @@ function NetworkConfiguration() {
           alert("Network updated successfully!");
           fetchNetworkInfo();
         } else {
-          alert("Error updating network: " + data.message);
+          alert(`Error updating network: ${data.message}`);
         }
       })
-      .catch((error) => {
-        console.error("Error updating network:", error);
-      });
+      .catch((error) => console.error("Error updating network:", error));
   };
-
   const handleInterfaceSelect = (iface) => {
     setSelectedInterface(iface);
     const selected = networkInfo[iface];
