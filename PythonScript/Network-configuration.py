@@ -36,6 +36,37 @@ def subnet_to_cidr(subnet):
     netmask = list(map(int, subnet.split('.')))
     return sum(bin(x).count('1') for x in netmask)
 
+def get_gateway_from_networkctl(interface):
+    """Fetch the gateway for a specific interface using the `networkctl` command."""
+    try:
+        result = subprocess.run(['networkctl', 'status', interface], stdout=subprocess.PIPE, text=True)
+        output = result.stdout
+
+        # Parse gateway from the output
+        for line in output.splitlines():
+            if 'Gateway:' in line:
+                gateway = line.split('Gateway:')[1].strip().split()[0]  # Extract the gateway IP
+                return gateway
+    except Exception as e:
+        print(f"Error fetching gateway for {interface}: {e}")
+    return "N/A"
+
+def get_dns_for_interface(interface):
+    """Fetch DNS information for a specific interface using resolvectl."""
+    try:
+        result = subprocess.run(['resolvectl', 'status', interface], stdout=subprocess.PIPE, text=True)
+        output = result.stdout
+
+        # Parse DNS Servers
+        dns_servers = []
+        for line in output.splitlines():
+            if "DNS Servers" in line:
+                dns_servers.extend(line.split("DNS Servers:")[1].strip().split())
+        return ', '.join(dns_servers) if dns_servers else "N/A"
+    except Exception as e:
+        print(f"Error fetching DNS for {interface}: {e}")
+        return "N/A"
+
 def get_available_interfaces():
     """Fetch available network interfaces using the custom method."""
     interfaces = {}
@@ -57,18 +88,26 @@ def get_available_interfaces():
                     subnet = parts[1].split('/')[1]
                     break
 
+            # Fetch gateway using networkctl
+            gateway = get_gateway_from_networkctl(interface)
+            
+            # Fetch DNS using resolvectl
+            dns = get_dns_for_interface(interface)
+
             interfaces[interface] = {
                 "Status": "Up" if "state UP" in output else "Down",
                 "IP Address": ip or "No IP",
                 "Subnet Mask": subnet or "No Subnet",
                 "DHCP Status": "Unknown",  # Will fetch from Netplan
-                "Gateway": "N/A",          # Will fetch from Netplan
-                "DNS": "N/A"               # Will fetch from Netplan
+                "Gateway": gateway,
+                "DNS": dns
             }
         except Exception as e:
             print(f"Error fetching details for interface {interface}: {e}")
 
     return interfaces
+
+
 
 def enrich_with_netplan(interfaces):
     """Fetch additional details from Netplan and enrich interface data."""
