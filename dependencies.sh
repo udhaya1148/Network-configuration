@@ -1,64 +1,71 @@
 #!/bin/bash
 
+# Update package lists
 sudo apt update
 
-
 # Install Gunicorn
-sudo apt install -y gunicorn
+sudo apt install -y gunicorn || { echo "Failed to install Gunicorn"; exit 1; }
 
-# Install Dependencies  for flask
-sudo apt install -y python3-flask-cors
-sudo apt install -y python3-psutil
+# Install Python dependencies for Flask
+sudo apt install -y python3-flask-cors python3-psutil || { echo "Failed to install Flask dependencies"; exit 1; }
 
-
-# Install Nodejs
+# Install Node.js and npm
 curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-sudo apt-get install nodejs -y
+sudo apt install -y nodejs  || { echo "Failed to install Node.js and npm"; exit 1; }
 
-#Install dependencies for react
-cd Network-configuration
-install npm
-npm install react-router-dom
-npm install react-icons --save
+# React app setup
+BASE_PATH="$HOME/Network-configuration"
+if [ -d "$BASE_PATH" ]; then
+    cd "$BASE_PATH" || { echo "Failed to navigate to $BASE_PATH"; exit 1; }
 
-# Install TailwindCss
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
+    # Install React and dependencies
+    npm install || { echo "Failed to install npm dependencies"; exit 1; }
+    npm install react-router-dom 
+    npm install react-icons --save || { echo "Failed to install React packages"; exit 1; }
 
-#Setup Cronjob
-cd
+    # Install TailwindCSS
+    npm install -D tailwindcss postcss autoprefixer || { echo "Failed to install TailwindCSS"; exit 1; }
+    npx tailwindcss init -p || { echo "Failed to initialize TailwindCSS"; exit 1; }
+else
+    echo "Directory $BASE_PATH not found. Exiting."
+    exit 1
+fi
 
 # Function to copy and make executable
 setup_script() {
-  local src_path="$1"
-  local dest_path="$2"
-  local description="$3"
-  echo "Setting up $description"
+    local src_path="$1"
+    local dest_path="$2"
+    local description="$3"
 
-  # Check if the destination file exists and remove it before copying
-  if [ -f "$dest_path" ]; then
-    echo "Removing existing file at $dest_path"
-    sudo rm -f "$dest_path"
-  fi
+    echo "Setting up $description"
 
-  sudo cp "$src_path" "$dest_path"
-  sudo chmod +x "$dest_path"
+    # Check if the source file exists
+    if [ ! -f "$src_path" ]; then
+        echo "Source file $src_path not found. Skipping $description."
+        return
+    fi
+
+    # Remove existing file at destination
+    [ -f "$dest_path" ] && sudo rm -f "$dest_path"
+
+    # Copy and set permissions
+    sudo cp "$src_path" "$dest_path"
+    sudo chmod +x "$dest_path"
 }
 
-# Network-Configuration setup
-setup_script "/home/netcon/Network-configuration/PythonScript/Network-configuration.py" "/bin/Network-configuration.py" "Network-configuration.py"
-sudo crontab -l | grep -v "/bin/Network-configuration.py" | { cat; echo "@reboot /usr/bin/python3 /bin/Network-configuration.py"; } | sudo crontab -
+# Setup Python and React scripts
+setup_script "$BASE_PATH/PythonScript/Network-configuration.py" "/bin/Network-configuration.py" "Network-configuration.py"
+setup_script "$BASE_PATH/PythonScript/arp-pythonscript.py" "/bin/arp-pythonscript.py" "arp-pythonscript.py"
+setup_script "$BASE_PATH/PythonScript/start-vite.sh" "/bin/start-vite.sh" "start-vite.sh"
 
-# Static-arp setup
-setup_script "/home/netcon/Network-configuration/PythonScript/arp-pythonscript.py" "/bin/arp-pythonscript.py" "arp-pythonscript.py"
-sudo crontab -l | grep -v "/bin/arp-pythonscript.py" | { cat; echo "@reboot /usr/bin/python3 /bin/arp-pythonscript.py"; } | sudo crontab -
-
-# React app setup
-setup_script "/home/netcon/Network-configuration/PythonScript/start-vite.sh" "/bin/start-vite.sh" "start-vite.sh"
-sudo crontab -l | grep -v "/home/netcon/Network-configuration/PythonScript/start-vite.sh" | { cat; echo "@reboot /home/netcon/Network-configuration/PythonScript/start-vite.sh"; } | sudo crontab -
+# Setup crontab entries
+sudo crontab -l > mycron || true
+{
+    echo "@reboot /usr/bin/python3 /bin/Network-configuration.py"
+    echo "@reboot /usr/bin/python3 /bin/arp-pythonscript.py"
+    echo "@reboot /bin/start-vite.sh"
+} >> mycron
+sudo crontab mycron
+rm mycron
 
 echo "Setup complete!"
-
-
-
-
