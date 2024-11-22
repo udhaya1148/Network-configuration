@@ -104,9 +104,9 @@ def update_network():
     interface = data.get('interface')
     ip = data.get('ip')
     subnet = data.get('subnet')
-    gateway = data.get('gateway')
-    dns_servers = data.get('dns')
-    dhcp_enabled = data.get('dhcp')
+    gateway = data.get('gateway', None)  # Default to None if not provided
+    dns_servers = data.get('dns', None)  # Default to None if not provided
+    dhcp_enabled = data.get('dhcp', None)  # Handle DHCP option
 
     try:
         # Find the first Netplan configuration file
@@ -136,10 +136,11 @@ def update_network():
             config['network']['ethernets'][interface].pop('gateway4', None)
             config['network']['ethernets'][interface].pop('routes', None)
         else:
-            if not subnet or not ip or not gateway or not dns_servers:
-                return jsonify({'status': 'error', 'message': 'All fields are required when DHCP is disabled.'}), 400
+            # Validate IP and subnet
+            if not ip or not subnet:
+                return jsonify({'status': 'error', 'message': 'IP address and subnet are required when DHCP is disabled.'}), 400
 
-            # Calculate CIDR if necessary
+            # Handle CIDR calculation
             if subnet.startswith('/'):
                 cidr_value = subnet.split('/')[1]
             elif subnet.count('.') == 3:
@@ -152,12 +153,16 @@ def update_network():
             config['network']['ethernets'][interface]['dhcp4'] = False
             config['network']['ethernets'][interface]['dhcp6'] = False
 
+            # Only set the IP and subnet
             config['network']['ethernets'][interface]['addresses'] = [f"{ip}/{cidr_value}"]
-            config['network']['ethernets'][interface]['nameservers'] = {'addresses': dns_servers}
-
-            existing_routes = config['network']['ethernets'][interface].get('routes', [])
-            default_route = {'to': '0.0.0.0/0', 'via': gateway, 'metric': 100 + len(existing_routes)}
-            config['network']['ethernets'][interface]['routes'] = [default_route]
+            
+            # Only set DNS and Gateway if provided
+            if dns_servers:
+                config['network']['ethernets'][interface]['nameservers'] = {'addresses': dns_servers}
+            if gateway:
+                existing_routes = config['network']['ethernets'][interface].get('routes', [])
+                default_route = {'to': '0.0.0.0/0', 'via': gateway, 'metric': 100 + len(existing_routes)}
+                config['network']['ethernets'][interface]['routes'] = [default_route]
 
         # Write the updated configuration back to the file
         with open(netplan_config_path, 'w') as f:
@@ -169,10 +174,9 @@ def update_network():
     try:
         # Apply the Netplan configuration
         subprocess.run(['sudo', 'netplan', 'apply'], check=True)
+        return jsonify({'status': 'success', 'message': 'Network configuration updated successfully!'})
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-    return jsonify({'status': 'success', 'message': f'Interface {interface} updated successfully.'})
+        return jsonify({'status': 'error', 'message': f'Failed to apply Netplan configuration: {e}'}), 500
 
 
 if __name__ == '__main__':
