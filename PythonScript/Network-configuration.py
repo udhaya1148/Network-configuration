@@ -1,12 +1,16 @@
-import os
-import subprocess
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import psutil
+import socket
+import os
+import subprocess
 import yaml
 import glob
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
+
+
 
 def get_physical_interfaces():
     """
@@ -105,41 +109,57 @@ def update_network():
     dhcp_enabled = data.get('dhcp')
 
     try:
+        # Find the first Netplan configuration file
         netplan_files = glob.glob('/etc/netplan/*.yaml')
         if not netplan_files:
             return jsonify({'status': 'error', 'message': 'No Netplan configuration files found.'}), 400
         
         netplan_config_path = netplan_files[0]
 
+        # Load the Netplan configuration
         with open(netplan_config_path, 'r') as f:
             config = yaml.safe_load(f)
 
-        if interface in config['network']['ethernets']:
-            if dhcp_enabled:
-                config['network']['ethernets'][interface]['dhcp4'] = True
-                config['network']['ethernets'][interface]['dhcp6'] = True
-                config['network']['ethernets'][interface].pop('addresses', None)
-                config['network']['ethernets'][interface].pop('nameservers', None)
-                config['network']['ethernets'][interface].pop('gateway4', None)
-            else:
-                if not subnet or not ip or not gateway or not dns_servers:
-                    return jsonify({'status': 'error', 'message': 'All fields are required when DHCP is disabled.'}), 400
+        # Check if the interface exists, add it if missing
+        if 'ethernets' not in config['network']:
+            config['network']['ethernets'] = {}
 
-                cidr_value = subnet_to_cidr(subnet) if '.' in subnet else subnet
-                
+        if interface not in config['network']['ethernets']:
+            config['network']['ethernets'][interface] = {}
 
-                config['network']['ethernets'][interface]['dhcp4'] = False
-                config['network']['ethernets'][interface]['dhcp6'] = False
-                config['network']['ethernets'][interface]['addresses'] = [f"{ip}/{cidr_value}"]
-                config['network']['ethernets'][interface]['nameservers'] = {'addresses': dns_servers}
-                existing_routes = config['network']['ethernets'][interface].get('routes', [])
-                default_route = {'to': '0.0.0.0/0', 'via': gateway, 'metric': 100 + len(existing_routes)}
-                config['network']['ethernets'][interface]['routes'] = [default_route]
-                #config['network']['ethernets'][interface]['gateway4'] = gateway
-
+        # Update the configuration for the interface
+        if dhcp_enabled:
+            config['network']['ethernets'][interface]['dhcp4'] = True
+            config['network']['ethernets'][interface]['dhcp6'] = True
+            config['network']['ethernets'][interface].pop('addresses', None)
+            config['network']['ethernets'][interface].pop('nameservers', None)
+            config['network']['ethernets'][interface].pop('gateway4', None)
+            config['network']['ethernets'][interface].pop('routes', None)
         else:
-            return jsonify({'status': 'error', 'message': f'Interface {interface} not found in Netplan configuration.'}), 400
-        
+            if not subnet or not ip or not gateway or not dns_servers:
+                return jsonify({'status': 'error', 'message': 'All fields are required when DHCP is disabled.'}), 400
+
+            # Calculate CIDR if necessary
+            if subnet.startswith('/'):
+                cidr_value = subnet.split('/')[1]
+            elif subnet.count('.') == 3:
+                cidr_value = subnet_to_cidr(subnet)
+            elif subnet.isdigit() and 0 <= int(subnet) <= 32:
+                cidr_value = subnet
+            else:
+                return jsonify({'status': 'error', 'message': 'Invalid subnet format.'}), 400
+
+            config['network']['ethernets'][interface]['dhcp4'] = False
+            config['network']['ethernets'][interface]['dhcp6'] = False
+
+            config['network']['ethernets'][interface]['addresses'] = [f"{ip}/{cidr_value}"]
+            config['network']['ethernets'][interface]['nameservers'] = {'addresses': dns_servers}
+
+            existing_routes = config['network']['ethernets'][interface].get('routes', [])
+            default_route = {'to': '0.0.0.0/0', 'via': gateway, 'metric': 100 + len(existing_routes)}
+            config['network']['ethernets'][interface]['routes'] = [default_route]
+
+        # Write the updated configuration back to the file
         with open(netplan_config_path, 'w') as f:
             yaml.dump(config, f)
 
@@ -147,13 +167,14 @@ def update_network():
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
     try:
+        # Apply the Netplan configuration
         subprocess.run(['sudo', 'netplan', 'apply'], check=True)
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-    return jsonify({'status': 'success'})
+    return jsonify({'status': 'success', 'message': f'Interface {interface} updated successfully.'})
 
-# Dynamically get the filename and start Gunicorn if the script is executed directly
+
 if __name__ == '__main__':
     # Get the script filename
     script_filename = os.path.basename(__file__)
