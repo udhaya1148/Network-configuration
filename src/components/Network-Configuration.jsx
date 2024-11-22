@@ -24,15 +24,33 @@ function NetworkConfiguration() {
   };
 
   const handleUpdate = () => {
+    // Validate if IP and Subnet are required in Manual configuration
+    if (dhcpEnabled === "Manual" && (!ip || !subnet)) {
+      alert("IP Address and Subnet are mandatory fields!");
+      return;
+    }
+
+    // Prepare the payload with optional DNS and Gateway
     const payload = {
       interface: selectedInterface,
       ip: dhcpEnabled === "DHCP" ? "" : ip,
       subnet: dhcpEnabled === "DHCP" ? "" : subnet,
-      gateway: dhcpEnabled === "DHCP" ? "" : gateway,
-      dns: dhcpEnabled === "DHCP" ? [] : dns.split(",").map((d) => d.trim()),
+      gateway: gateway ? gateway : null, // Set Gateway to null if not provided
+      dns: dns ? dns.split(",").map((d) => d.trim()) : [], // DNS array if provided
       dhcp: dhcpEnabled === "DHCP",
     };
 
+    // If gateway is missing, don't send it, so netplan can use the default route
+    if (!gateway) {
+      delete payload.gateway;
+    }
+
+    // If DNS is missing, don't send it, so netplan can use the default DNS configuration
+    if (dns.length === 0) {
+      delete payload.dns;
+    }
+
+    // Make the API call to update network configuration
     fetch("/api1/update-network", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -42,6 +60,13 @@ function NetworkConfiguration() {
       .then((data) => {
         if (data.status === "success") {
           alert("Network updated successfully!");
+          // Clear input fields and reset DHCP to default
+          setIp("");
+          setSubnet("");
+          setGateway("");
+          setDns("");
+          setDhcpEnabled("DHCP");
+          setSelectedInterface("");
           fetchNetworkInfo();
         } else {
           alert(`Error updating network: ${data.message}`);
@@ -49,17 +74,27 @@ function NetworkConfiguration() {
       })
       .catch((error) => console.error("Error updating network:", error));
   };
+
   const handleInterfaceSelect = (iface) => {
     setSelectedInterface(iface);
+
+    // Check if the selected interface exists in the fetched network information
     const selected = networkInfo[iface];
     if (selected) {
-      setIp(selected["IP Address"] || "");
-      setSubnet(selected["Subnet Mask"] || "");
-      setGateway(selected["Gateway"] || "");
-      setDns(selected["DNS"] || "");
+      setIp(selected["IP Address"] ? selected["IP Address"].join(", ") : ""); // Set to empty string if no IP Address found
+      setSubnet(
+        selected["Subnet Mask"] ? selected["Subnet Mask"].join(", ") : ""
+      ); // Set to empty string if no Subnet Mask found
+      setGateway(selected["Gateway"] ? selected["Gateway"].join(", ") : ""); // Set to empty string if no Gateway found
+      setDns(selected["DNS"] ? selected["DNS"].join(", ") : ""); // Convert DNS array to comma-separated string or set to empty
       setDhcpEnabled(selected["DHCP Status"] === "DHCP" ? "DHCP" : "Manual");
     } else {
+      // Clear all fields if the interface has no data
+      setIp("");
+      setSubnet("");
+      setGateway("");
       setDns("");
+      setDhcpEnabled("DHCP");
     }
   };
 
@@ -142,7 +177,7 @@ function NetworkConfiguration() {
                   <label>IP Address: </label>
                   <input
                     type="text"
-                    value={ip}
+                    value={ip} // This will remain empty if no IP is available
                     onChange={(e) => setIp(e.target.value)}
                     placeholder="Enter IP Address"
                     className="h-[1.5rem] w-[15rem] bg-gray-200 outline-none px-4 ml-1 border border-gray-300 rounded-md"
@@ -153,7 +188,7 @@ function NetworkConfiguration() {
                   <label>Subnet Mask / CIDR: </label>
                   <input
                     type="text"
-                    value={subnet}
+                    value={subnet} // This will remain empty if no subnet is available
                     onChange={(e) => setSubnet(e.target.value)}
                     placeholder="Enter Subnet Mask or CIDR"
                     className="h-[1.5rem] w-[15rem] bg-gray-200 outline-none px-4 ml-1 border border-gray-300 rounded-md"
@@ -164,9 +199,9 @@ function NetworkConfiguration() {
                   <label>Gateway: </label>
                   <input
                     type="text"
-                    value={gateway}
+                    value={gateway} // This will remain empty if no gateway is available
                     onChange={(e) => setGateway(e.target.value)}
-                    placeholder="Enter Gateway"
+                    placeholder="Enter Gateway (optional)"
                     className="h-[1.5rem] w-[15rem] bg-gray-200 outline-none px-4 ml-1 border border-gray-300 rounded-md"
                   />
                 </div>
@@ -175,9 +210,9 @@ function NetworkConfiguration() {
                   <label>DNS (comma separated): </label>
                   <input
                     type="text"
-                    value={dns}
+                    value={dns} // This will remain empty if no DNS is available
                     onChange={(e) => setDns(e.target.value)}
-                    placeholder="Enter DNS Servers"
+                    placeholder="Enter DNS (optional)"
                     className="h-[1.5rem] w-[15rem] bg-gray-200 outline-none px-4 ml-1 border border-gray-300 rounded-md"
                   />
                 </div>
@@ -186,9 +221,9 @@ function NetworkConfiguration() {
 
             <button
               onClick={handleUpdate}
-              className="h-[2rem] w-[7rem] bg-blue-500 text-white rounded-md mt-2 hover:bg-blue-600"
+              className="bg-blue-600 text-white p-2 rounded-md mt-4"
             >
-              Update
+              Update Network Configuration
             </button>
           </div>
         </div>
