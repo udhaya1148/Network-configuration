@@ -117,6 +117,7 @@ def update_network():
         if interface in config['network']['ethernets']:
             if dhcp_enabled:
                 config['network']['ethernets'][interface]['dhcp4'] = True
+                config['network']['ethernets'][interface]['dhcp6'] = True
                 config['network']['ethernets'][interface].pop('addresses', None)
                 config['network']['ethernets'][interface].pop('nameservers', None)
                 config['network']['ethernets'][interface].pop('gateway4', None)
@@ -124,12 +125,24 @@ def update_network():
                 if not subnet or not ip or not gateway or not dns_servers:
                     return jsonify({'status': 'error', 'message': 'All fields are required when DHCP is disabled.'}), 400
 
-                cidr_value = subnet_to_cidr(subnet) if '.' in subnet else subnet
+                #cidr_value = subnet_to_cidr(subnet) if '.' in subnet else subnet
+                if subnet.startswith('/'):
+                    cidr_value = subnet.split('/')[1]
+                elif subnet.count('.') == 3:
+                    cidr_value = subnet_to_cidr(subnet)
+                elif subnet.isdigit() and 0 <= int(subnet) <= 32:
+                    cidr_value = subnet
+                else:
+                    return jsonify({'status': 'error', 'message': 'Invalid subnet format.'}), 400
 
                 config['network']['ethernets'][interface]['dhcp4'] = False
+                config['network']['ethernets'][interface]['dhcp6'] = False
                 config['network']['ethernets'][interface]['addresses'] = [f"{ip}/{cidr_value}"]
                 config['network']['ethernets'][interface]['nameservers'] = {'addresses': dns_servers}
-                config['network']['ethernets'][interface]['gateway4'] = gateway
+                existing_routes = config['network']['ethernets'][interface].get('routes', [])
+                default_route = {'to': '0.0.0.0/0', 'via': gateway, 'metric': 100 + len(existing_routes)}
+                config['network']['ethernets'][interface]['routes'] = [default_route]
+                #config['network']['ethernets'][interface]['gateway4'] = gateway
 
         else:
             return jsonify({'status': 'error', 'message': f'Interface {interface} not found in Netplan configuration.'}), 400
