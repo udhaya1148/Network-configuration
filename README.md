@@ -77,3 +77,11 @@ export default {
   plugins: [],
 }
 ```
+# Setup Cronjob to run React and Python script 
+```
+cd Network-configuration
+```
+```
+./setup_cronjob.sh
+```
+
