@@ -101,8 +101,8 @@ function NetworkConfiguration() {
     <div className="flex flex-row h-screen w-screen">
       <SideMenu />
       <div className="flex-grow p-6 overflow-auto mt-4 justify-center">
-        <div className="border border-gray-500 mb-2 p-6 bg-white rounded-lg shadow-lg">
-          <div className="border border-gray-500 p-6 mb-4">
+        <div className="border border-black mb-2 p-6 bg-white rounded-lg shadow-lg">
+          <div className="border border-black p-6 mb-4">
             <h3 className="text-3xl text-blue-600 font-bold">
               Available Interfaces
             </h3>
@@ -118,7 +118,7 @@ function NetworkConfiguration() {
             {Object.entries(networkInfo).map(([iface, info]) => (
               <div
                 key={iface}
-                className="flex items-center justify-between bg-gray-100 p-2 mb-2 rounded-lg"
+                className="flex items-center border border-black justify-between bg-gray-100 p-2 mb-2 rounded-lg"
               >
                 <strong className="flex-1">{iface}</strong>
                 <div className="flex-1">{info.Status}</div>
@@ -141,12 +141,15 @@ function NetworkConfiguration() {
             <h2 className="text-3xl font-bold text-blue-600 mb-4">
               Network Configuration
             </h2>
-            <div className="mb-4">
-              <label>Select Interface:</label>
+            <div className="flex items-center mb-4">
+              <label className="w-1/3 text-left font-bold flex items-center justify-between">
+                <span>Select Interface</span>
+                <span>:</span>
+              </label>
               <select
                 onChange={(e) => handleInterfaceSelect(e.target.value)}
                 value={selectedInterface}
-                className="h-[1.5rem] w-[16rem] outline-none px-4 ml-2 border border-gray-300 rounded-md"
+                className="h-[1.5rem] w-[16rem] outline-none px-4 ml-2 border border-black rounded-md"
               >
                 <option value="">-- Select Interface --</option>
                 {Object.keys(networkInfo).map((iface) => (
@@ -158,12 +161,15 @@ function NetworkConfiguration() {
               </select>
             </div>
 
-            <div className="mb-4">
-              <label>Select Configuration:</label>
+            <div className="flex items-center mb-4">
+              <label className="w-1/3 text-left font-bold flex items-center justify-between">
+                <span>Select Configuration</span>
+                <span>:</span>
+              </label>
               <select
                 onChange={(e) => setDhcpEnabled(e.target.value)}
                 value={dhcpEnabled}
-                className="h-[1.5rem] w-[16rem] outline-none px-4 ml-2 border border-gray-300 rounded-md"
+                className="h-[1.5rem] w-[16rem] outline-none px-4 ml-2 border border-black rounded-md"
               >
                 <option value="DHCP">DHCP</option>
                 <option value="Manual">Manual</option>
@@ -172,47 +178,59 @@ function NetworkConfiguration() {
 
             {dhcpEnabled === "Manual" && (
               <>
-                <div className="mb-4">
-                  <label>IP Address: </label>
+                <div className="flex item-center mb-4">
+                  <label className="w-1/3 text-left font-bold flex items-center justify-between">
+                    <span>IP Address</span>
+                    <span>:</span>
+                  </label>
                   <input
                     type="text"
                     value={ip} // This will remain empty if no IP is available
                     onChange={(e) => setIp(e.target.value)}
                     placeholder="Enter IP Address"
-                    className="h-[1.5rem] w-[15rem] bg-gray-200 outline-none px-4 ml-1 border border-gray-300 rounded-md"
+                    className="h-[1.5rem] w-[16rem] bg-gray-200 outline-none px-4 ml-1 border border-black rounded-md"
                   />
                 </div>
 
-                <div className="mb-4">
-                  <label>Subnet Mask / CIDR: </label>
+                <div className="flex items-center mb-4">
+                  <label className="w-1/3 text-left font-bold flex items-center justify-between">
+                    <span>Subnet Mask / CIDR</span>
+                    <span>:</span>
+                  </label>
                   <input
                     type="text"
                     value={subnet} // This will remain empty if no subnet is available
                     onChange={(e) => setSubnet(e.target.value)}
                     placeholder="Enter Subnet Mask or CIDR"
-                    className="h-[1.5rem] w-[15rem] bg-gray-200 outline-none px-4 ml-1 border border-gray-300 rounded-md"
+                    className="h-[1.5rem] w-[16rem] bg-gray-200 outline-none px-4 ml-1 border border-black rounded-md"
                   />
                 </div>
 
-                <div className="mb-4">
-                  <label>Gateway: </label>
+                <div className="flex items-center mb-4">
+                  <label className="w-1/3 text-left font-bold flex items-center justify-between">
+                    <span>Gateway</span>
+                    <span>: </span>
+                  </label>
                   <input
                     type="text"
                     value={gateway} // This will remain empty if no gateway is available
                     onChange={(e) => setGateway(e.target.value)}
                     placeholder="Enter Gateway (optional)"
-                    className="h-[1.5rem] w-[15rem] bg-gray-200 outline-none px-4 ml-1 border border-gray-300 rounded-md"
+                    className="h-[1.5rem] w-[16rem] bg-gray-200 outline-none px-4 ml-1 border border-black rounded-md"
                   />
                 </div>
 
-                <div className="mb-4">
-                  <label>DNS (comma separated): </label>
+                <div className="flex items-center mb-4">
+                  <label className="w-1/3 text-left font-bold flex items-center justify-between">
+                    <span>DNS (comma separated)</span>
+                    <span>: </span>
+                  </label>
                   <input
                     type="text"
                     value={dns} // This will remain empty if no DNS is available
                     onChange={(e) => setDns(e.target.value)}
                     placeholder="Enter DNS (optional)"
-                    className="h-[1.5rem] w-[15rem] bg-gray-200 outline-none px-4 ml-1 border border-gray-300 rounded-md"
+                    className="h-[1.5rem] w-[16rem] bg-gray-200 outline-none px-4 ml-1 border border-black rounded-md"
                   />
                 </div>
               </>
