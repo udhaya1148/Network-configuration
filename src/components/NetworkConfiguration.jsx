@@ -81,14 +81,13 @@ function NetworkConfiguration() {
     // Check if the selected interface exists in the fetched network information
     const selected = networkInfo[iface];
     if (selected) {
-      setIp(selected["IP Address"] ? selected["IP Address"].join(", ") : ""); // Set to empty string if no IP Address found
-      setSubnet(
-        selected["Subnet Mask"] ? selected["Subnet Mask"].join(", ") : ""
-      ); // Set to empty string if no Subnet Mask found
-      setGateway(selected["Gateway"] ? selected["Gateway"].join(", ") : ""); // Set to empty string if no Gateway found
-      setDns(selected["DNS"] ? selected["DNS"].join(", ") : ""); // Convert DNS array to comma-separated string or set to empty
+      setIp(selected["IP Address"] || "");
+      setSubnet(selected["Subnet Mask"] || "");
+      setGateway(selected["Gateway"] || "");
+      setDns(selected["DNS"] || "");
       setDhcpEnabled(selected["DHCP Status"] === "DHCP" ? "DHCP" : "Manual");
     } else {
+      //setDns("");
       // Clear all fields if the interface has no data
       setIp("");
       setSubnet("");
