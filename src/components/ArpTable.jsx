@@ -49,7 +49,7 @@ const ArpTable = () => {
           )}
 
           {/* Always display headings */}
-          <div className="grid grid-cols-5 gap-4 font-bold border border-black text-lg bg-gray-200 p-3 rounded-md">
+          <div className="grid grid-cols-5 gap-4 font-bold border border-black bg-gray-200 p-3 rounded-md">
             <div className="text-gray-700">IP Address</div>
             <div className="text-gray-700">Hardware Type</div>
             <div className="text-gray-700">MAC Address</div>
