@@ -12,7 +12,7 @@ const AddStaticArp = () => {
 
   const fetchArpData = async () => {
     try {
-      const response = await fetch("/api2/arp");
+      const response = await fetch("http://172.18.1.172:5002/arp");
       if (!response.ok) {
         throw new Error("Failed to fetch ARP data");
       }
@@ -26,7 +26,7 @@ const AddStaticArp = () => {
 
   const fetchInterfaces = async () => {
     try {
-      const response = await fetch("/api2/interfaces");
+      const response = await fetch("http://172.18.1.172:5002/interfaces");
       if (!response.ok) {
         throw new Error("Failed to fetch interfaces");
       }
@@ -46,7 +46,7 @@ const AddStaticArp = () => {
 
     const arpEntry = { ip, mac };
     try {
-      const response = await fetch("/api2/static", {
+      const response = await fetch("http://172.18.1.172:5002/static", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -78,9 +78,7 @@ const AddStaticArp = () => {
     return segments.every((segment) => {
       if (!/^\d+$/.test(segment)) return false; // Check if segment is a number
       const num = parseInt(segment, 10);
-      if (num < 0 || num > 255) return false; // Check range
-      if (segment.length > 1 && segment.startsWith("0")) return false; // Prevent leading zeros
-      return true;
+      return num >= 0 && num <= 255 && (segment.length === 1 || !segment.startsWith("0"));
     });
   };
 
@@ -88,7 +86,7 @@ const AddStaticArp = () => {
     fetchArpData();
     fetchInterfaces();
     const interval = setInterval(fetchArpData, 2000);
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); // Clear the interval on cleanup
   }, []);
 
   const handleIpChange = (e) => {
@@ -114,34 +112,51 @@ const AddStaticArp = () => {
   };
 
   return (
-    <div className="flex flex-row h-screen w-screen">
+    <div className="flex h-screen w-screen">
       <SideMenu />
-      <div className="flex-grow p-6 overflow-auto mt-4 justify-center">
-        {/* Error Message */}
-        {error && <div className="text-red-500 mb-4">{error}</div>}
+      <div className="flex-grow p-6 overflow-auto">
+        <div className="border border-black p-6 bg-white rounded-lg shadow-lg">
+          <h3 className="text-blue-600 text-3xl font-bold mb-4">ARP Table</h3>
 
-        {/* ARP Table */}
-        <div className="border border-gray-300 mb-4 p-6 bg-white rounded-lg shadow-lg">
-          <h3 className="text-blue-600 text-3xl font-bold">ARP Table</h3>
-          {arpData.length === 0 && (
-            <div className="text-gray-500 mt-4">No ARP data available.</div>
-          )}
-          {arpData.map((entry, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-2 bg-gray-200 rounded-lg mt-2"
-            >
-              <div className="flex-1 text-gray-700">{entry.ip}</div>
-              <div className="flex-1 text-gray-700">{entry.hw_type}</div>
-              <div className="flex-1 text-gray-700">{entry.mac}</div>
-              <div className="flex-1 text-gray-700">{entry.flags}</div>
-              <div className="flex-1 text-gray-700">{entry.iface}</div>
+          {/* Error Display */}
+          {error && (
+            <div className="text-red-600 font-semibold mb-4">
+              Error: {error}
             </div>
-          ))}
+          )}
+
+          {/* Table Headings */}
+          <div className="grid grid-cols-5 gap-4 font-bold bg-gray-100 p-4 rounded-md border border-black">
+            <div className="text-gray-700">IP Address</div>
+            <div className="text-gray-700">Hardware Type</div>
+            <div className="text-gray-700">MAC Address</div>
+            <div className="text-gray-700">Flags</div>
+            <div className="text-gray-700">Interface</div>
+          </div>
+
+          {/* ARP Data */}
+          {arpData.length > 0 ? (
+            <div className="divide-y divide-gray-200">
+              {arpData.map((entry, index) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-5 gap-4 items-center bg-gray-50 p-3 rounded-md mt-2 border border-gray-200"
+                >
+                  <div>{entry.ip || "N/A"}</div>
+                  <div>{entry.hw_type || "N/A"}</div>
+                  <div>{entry.mac || "N/A"}</div>
+                  <div>{entry.flags || "N/A"}</div>
+                  <div>{entry.iface || "N/A"}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-500">No ARP data available.</div>
+          )}
         </div>
 
         {/* Form for Adding Static ARP Entry */}
-        <div className="border border-gray-300 p-6 bg-white rounded-lg shadow-lg">
+        <div className="border border-black p-6 bg-white rounded-lg shadow-lg mt-6">
           <h4 className="text-xl text-blue-600 font-bold mb-4">Add Static ARP</h4>
 
           {/* Success Message */}
@@ -150,29 +165,29 @@ const AddStaticArp = () => {
           )}
 
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2">
-              IP Address
+            <label className="block text-black font-bold mb-2">
+              IP Address :
             </label>
             <input
               type="text"
               value={ip}
               onChange={handleIpChange}
               placeholder="e.g., 192.168.0.1"
-              className="w-full p-2 border border-gray-300 rounded-lg"
+              className="w-full p-2 border border-black rounded-lg"
             />
             {ipError && <div className="text-red-500 text-sm">{ipError}</div>}
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2">
-              MAC Address
+            <label className="block text-black font-bold mb-2">
+              MAC Address :
             </label>
             <input
               type="text"
               value={formatMacForDisplay(mac)}
               onChange={handleMacChange}
               placeholder="e.g., AABBCCDDEEFF"
-              className="w-full p-2 border border-gray-300 rounded-lg"
+              className="w-full p-2 border border-black rounded-lg"
             />
           </div>
 
