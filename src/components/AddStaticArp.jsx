@@ -126,33 +126,32 @@ const AddStaticArp = () => {
           )}
 
           {/* Table Headings */}
-          <div className="grid grid-cols-5 gap-4 font-bold bg-gray-100 p-4 rounded-md border border-black">
-            <div className="text-gray-700">IP Address</div>
-            <div className="text-gray-700">Hardware Type</div>
-            <div className="text-gray-700">MAC Address</div>
-            <div className="text-gray-700">Flags</div>
-            <div className="text-gray-700">Interface</div>
+          <div className="flex items-center justify-between mt-4 bg-gray-200 border border-black p-2 rounded-lg">
+            <div className="font-bold flex-1">IP Address</div>
+            <div className="font-bold flex-1">Hardware Type</div>
+            <div className="font-bold flex-1">MAC Address</div>
+            <div className="font-bold flex-1">Flags</div>
+            <div className="font-bold flex-1">Interface</div>
           </div>
 
           {/* ARP Data */}
-          {arpData.length > 0 ? (
-            <div className="divide-y divide-gray-200">
-              {arpData.map((entry, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-5 gap-4 items-center bg-gray-50 p-3 rounded-md mt-2 border border-gray-200"
-                >
-                  <div>{entry.ip || "N/A"}</div>
-                  <div>{entry.hw_type || "N/A"}</div>
-                  <div>{entry.mac || "N/A"}</div>
-                  <div>{entry.flags || "N/A"}</div>
-                  <div>{entry.iface || "N/A"}</div>
-                </div>
-              ))}
+          {arpData?.length === 0 && (
+            <div className="text-center text-gray-500 mt-4">
+              No ARP entries found.
             </div>
-          ) : (
-            <div className="text-gray-500">No ARP data available.</div>
           )}
+          {arpData.map((entry, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between p-2 bg-gray-100 border border-black rounded-lg mt-2"
+            >
+              <div className="flex-1">{entry.ip}</div>
+              <div className="flex-1">{entry.hw_type}</div>
+              <div className="flex-1">{entry.mac}</div>
+              <div className="flex-1">{entry.flags}</div>
+              <div className="flex-1">{entry.iface}</div>
+            </div>
+          ))}
         </div>
 
         {/* Form for Adding Static ARP Entry */}
