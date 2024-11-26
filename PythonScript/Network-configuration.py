@@ -135,6 +135,10 @@ def network_info():
 
 @app.route('/update-network', methods=['POST'])
 def update_network():
+    """
+    Updates the network configuration for a given interface based on the provided
+    JSON payload.
+    """
     data = request.json
     interface = data.get('interface')
     ip = data.get('ip')
@@ -144,7 +148,7 @@ def update_network():
     dhcp_enabled = data.get('dhcp', None)
 
     try:
-        # Find and load the first Netplan configuration file
+        # Find the first Netplan configuration file
         netplan_files = glob.glob('/etc/netplan/*.yaml')
         if not netplan_files:
             return jsonify({'status': 'error', 'message': 'No Netplan configuration files found.'}), 400
@@ -155,20 +159,20 @@ def update_network():
 
         # Ensure the 'ethernets' key exists
         config.setdefault('network', {}).setdefault('ethernets', {})
-
-        # Update or add interface configuration
         interface_config = config['network']['ethernets'].setdefault(interface, {})
-        
+
         if dhcp_enabled:
+            # Enable DHCP and clear static configurations
             interface_config['dhcp4'] = True
             interface_config['dhcp6'] = True
             interface_config.pop('addresses', None)
             interface_config.pop('nameservers', None)
             interface_config.pop('routes', None)
         else:
+            # Validate IP address and subnet when DHCP is disabled
             if not ip or not subnet:
                 return jsonify({'status': 'error', 'message': 'IP address and subnet are required when DHCP is disabled.'}), 400
-            
+
             # Handle subnet mask and CIDR notation
             if '/' in subnet:
                 cidr = subnet.split('/')[1]
@@ -179,31 +183,37 @@ def update_network():
             else:
                 return jsonify({'status': 'error', 'message': 'Invalid subnet format.'}), 400
 
+            # Update static IP configuration
             interface_config['dhcp4'] = False
             interface_config['dhcp6'] = False
             interface_config['addresses'] = [f"{ip}/{cidr}"]
 
+            # Handle DNS configuration
             if dns_servers:
                 interface_config['nameservers'] = {'addresses': dns_servers}
+            else:
+                interface_config.pop('nameservers', None)
+
+            # Handle Gateway configuration
             if gateway:
                 interface_config['routes'] = [{'to': '0.0.0.0/0', 'via': gateway, 'metric': 100}]
+            else:
+                interface_config.pop('routes', None)
 
         # Write back the updated configuration
         with open(netplan_config_path, 'w') as f:
             yaml.dump(config, f)
 
-        # Apply the changes
+        # Apply the changes using Netplan
         subprocess.run(['sudo', 'netplan', 'apply'], check=True)
 
         # Bring up the interface if it's down
         subprocess.run(['sudo', 'ip', 'link', 'set', interface, 'up'], check=False)
-        
-        return jsonify({'status': 'success', 'message': 'Network configuration updated and saved permanently!'})
 
+        return jsonify({'status': 'success', 'message': 'Network configuration updated and saved permanently!'})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
-
-
+    
 if __name__ == '__main__':
     # Get the script filename
     script_filename = os.path.basename(__file__)
