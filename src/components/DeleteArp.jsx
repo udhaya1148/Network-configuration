@@ -13,7 +13,7 @@ const DeleteArp = () => {
   // Function to fetch ARP data
   const fetchArpData = async () => {
     try {
-      const response = await fetch(`/api2/arp`);
+      const response = await fetch(`http://172.18.1.172:5002/arp`);
       if (!response.ok) {
         throw new Error("Failed to fetch ARP data");
       }
@@ -105,9 +105,9 @@ const DeleteArp = () => {
         {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
 
         {/* ARP Table Display */}
-        <div className="border border-gray-500 mb-4 p-6 bg-white rounded-lg shadow-lg">
+        <div className="border border-black mb-4 p-6 bg-white rounded-lg shadow-lg">
           <h3 className="text-blue-600 text-3xl font-bold">ARP Table</h3>
-          <div className="flex items-center justify-between mt-4 bg-gray-100 p-2 rounded">
+          <div className="flex items-center justify-between mt-4 bg-gray-200 border border-black p-2 rounded">
             <div className="font-bold flex-1">IP Address</div>
             <div className="font-bold flex-1">Hardware Type</div>
             <div className="font-bold flex-1">MAC Address</div>
@@ -122,7 +122,7 @@ const DeleteArp = () => {
           {arpData.map((entry, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-2 bg-gray-200 rounded-lg mt-2"
+              className="flex items-center justify-between p-2 bg-gray-100 border border-black rounded-lg mt-2"
             >
               <div className="flex-1">{entry.ip}</div>
               <div className="flex-1">{entry.hw_type}</div>
@@ -146,7 +146,7 @@ const DeleteArp = () => {
               value={ip}
               onChange={handleIpChange}
               placeholder="e.g., 192.168.0.1"
-              className="w-full p-2 border border-gray-300 rounded-lg"
+              className="w-full p-2 border border-black rounded-lg"
             />
             {ipError && <div className="text-red-500 text-sm">{ipError}</div>}
           </div>
