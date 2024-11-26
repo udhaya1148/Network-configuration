@@ -10,8 +10,6 @@ import glob
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-
-
 def get_physical_interfaces():
     """
     Retrieves a list of physical network interfaces available on the system.
@@ -107,8 +105,6 @@ def get_available_interfaces():
 
     return interfaces
 
-
-
 def enrich_with_netplan(interfaces):
     """Fetch additional details from Netplan and enrich interface data."""
     netplan_config_path = '/etc/netplan'
@@ -162,6 +158,7 @@ def update_network():
 
         # Update or add interface configuration
         interface_config = config['network']['ethernets'].setdefault(interface, {})
+        
         if dhcp_enabled:
             interface_config['dhcp4'] = True
             interface_config['dhcp6'] = True
@@ -177,6 +174,8 @@ def update_network():
                 cidr = subnet.split('/')[1]
             elif subnet.count('.') == 3:
                 cidr = subnet_to_cidr(subnet)
+            elif subnet.isdigit() and 0 <= int(subnet) <= 32:
+                cidr = subnet
             else:
                 return jsonify({'status': 'error', 'message': 'Invalid subnet format.'}), 400
 
@@ -195,6 +194,10 @@ def update_network():
 
         # Apply the changes
         subprocess.run(['sudo', 'netplan', 'apply'], check=True)
+
+        # Bring up the interface if it's down
+        subprocess.run(['sudo', 'ip', 'link', 'set', interface, 'up'], check=False)
+        
         return jsonify({'status': 'success', 'message': 'Network configuration updated and saved permanently!'})
 
     except Exception as e:
