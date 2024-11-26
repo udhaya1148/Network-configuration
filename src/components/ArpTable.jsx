@@ -8,7 +8,7 @@ const ArpTable = () => {
   // Function to fetch ARP data
   const fetchArpData = async () => {
     try {
-      const response = await fetch("/api2/arp");
+      const response = await fetch("http://172.18.1.172:5002/arp");
       if (!response.ok) {
         throw new Error(`Failed to fetch ARP data: ${response.statusText}`);
       }
@@ -48,13 +48,13 @@ const ArpTable = () => {
             </div>
           )}
 
-          {/* Always display headings */}
-          <div className="grid grid-cols-5 gap-4 font-bold border border-black bg-gray-200 p-3 rounded-md">
-            <div className="text-gray-700">IP Address</div>
-            <div className="text-gray-700">Hardware Type</div>
-            <div className="text-gray-700">MAC Address</div>
-            <div className="text-gray-700">Flags</div>
-            <div className="text-gray-700">Interface</div>
+          {/* Table Headings */}
+          <div className="flex items-center justify-between mt-4 bg-gray-200 border border-black p-2 rounded-lg">
+            <div className="font-bold flex-1">IP Address</div>
+            <div className="font-bold flex-1">Hardware Type</div>
+            <div className="font-bold flex-1">MAC Address</div>
+            <div className="font-bold flex-1">Flags</div>
+            <div className="font-bold flex-1">Interface</div>
           </div>
 
           {/* Display ARP Data */}
@@ -63,13 +63,13 @@ const ArpTable = () => {
               {arpData.map((entry, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-5 border border-black gap-4 items-center bg-gray-100 p-3 rounded-md mt-2"
+                  className="flex items-center justify-between p-2 bg-gray-100 border border-black rounded-lg mt-2"
                 >
-                  <div>{entry.ip || "N/A"}</div>
-                  <div>{entry.hw_type || "N/A"}</div>
-                  <div>{entry.mac || "N/A"}</div>
-                  <div>{entry.flags || "N/A"}</div>
-                  <div>{entry.iface || "N/A"}</div>
+                  <div className="flex-1">{entry.ip}</div>
+                  <div className="flex-1">{entry.hw_type}</div>
+                  <div className="flex-1">{entry.mac}</div>
+                  <div className="flex-1">{entry.flags}</div>
+                  <div className="flex-1">{entry.iface}</div>
                 </div>
               ))}
             </div>
