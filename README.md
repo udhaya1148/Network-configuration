@@ -23,7 +23,15 @@ This project is a web-based utility built with React.js and Flask to display and
   ```
   ./dependencies.sh
   ```
-  
+
+  # Setup_Cronjob
+  ```
+   sudo chmod +x /home/netcon/Network-configuration/cronjob.sh
+  ```
+  ```
+  ./cronjob.sh
+  ```
+
   # Install dependencies for python
   ```
   sudo apt install python3-flask-cors
