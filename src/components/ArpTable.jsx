@@ -13,58 +13,66 @@ const ArpTable = () => {
         throw new Error(`Failed to fetch ARP data: ${response.statusText}`);
       }
       const data = await response.json();
-      setArpData(data);
-      setError(null); // Clear the error when data fetch is successful
+
+      // Ensure data is an array before setting state
+      if (Array.isArray(data)) {
+        setArpData(data);
+        setError(null);
+      } else {
+        throw new Error("Unexpected API response format.");
+      }
     } catch (err) {
       setError(err.message);
-      setArpData([]); // clear the ARP data to avoid showing stale data
+      setArpData([]);
     }
   };
 
   // useEffect for periodic data fetching
   useEffect(() => {
     fetchArpData();
-    const interval = setInterval(fetchArpData, 2000); // Refresh every 5 seconds
+    const interval = setInterval(fetchArpData, 2000); // Refresh every 2 seconds
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
   return (
-    <div className="flex flex-row h-screen w-screen">
+    <div className="flex h-screen w-screen mt=10">
       <SideMenu />
-      <div className="flex-grow p-6 overflow-auto mt-4 justify-center">
-        <div className="border border-gray-500 mb-2 p-6 bg-white rounded-lg shadow-lg">
-          <h3 className="text-blue-600 text-3xl font-bold">ARP Table</h3>
+      <div className="flex-grow p-6 overflow-auto">
+        <div className="border border-black p-6 bg-white rounded-lg shadow-md">
+          <h3 className="text-blue-600 text-3xl font-bold mb-4">ARP Table</h3>
 
-          {/* Error display */}
+          {/* Error Display */}
           {error && (
-            <div className="text-red-600 font-bold mb-4">
+            <div className="text-red-600 font-semibold mb-4">
               Error: {error}
             </div>
           )}
 
-          {/* ARP table header */}
-          <div className="flex items-center justify-between mt-4 font-bold">
-            <div className="flex-1">IP Address</div>
-            <div className="flex-1">Hardware Type</div>
-            <div className="flex-1">MAC Address</div>
-            <div className="flex-1">Flags</div>
-            <div className="flex-1">Interface</div>
+          {/* Always display headings */}
+          <div className="grid grid-cols-5 gap-4 font-bold border border-black text-lg bg-gray-200 p-3 rounded-md">
+            <div className="text-gray-700">IP Address</div>
+            <div className="text-gray-700">Hardware Type</div>
+            <div className="text-gray-700">MAC Address</div>
+            <div className="text-gray-700">Flags</div>
+            <div className="text-gray-700">Interface</div>
           </div>
 
-          {/* ARP table rows */}
+          {/* Display ARP Data */}
           {arpData.length > 0 ? (
-            arpData.map((entry, index) => (
-              <div
-                key={entry.id || index} // Ensure unique keys
-                className="flex items-center justify-between bg-gray-200 rounded-lg p-4 mt-2 mb-2"
-              >
-                <div className="flex-1">{entry.ip || "N/A"}</div>
-                <div className="flex-1">{entry.hw_type || "N/A"}</div>
-                <div className="flex-1">{entry.mac || "N/A"}</div>
-                <div className="flex-1">{entry.flags || "N/A"}</div>
-                <div className="flex-1">{entry.iface || "N/A"}</div>
-              </div>
-            ))
+            <div className="divide-y divide-gray-300">
+              {arpData.map((entry, index) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-5 border border-black gap-4 items-center bg-gray-100 p-3 rounded-md mt-2"
+                >
+                  <div>{entry.ip || "N/A"}</div>
+                  <div>{entry.hw_type || "N/A"}</div>
+                  <div>{entry.mac || "N/A"}</div>
+                  <div>{entry.flags || "N/A"}</div>
+                  <div>{entry.iface || "N/A"}</div>
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="text-gray-500 mt-4">No ARP data available</div>
           )}
