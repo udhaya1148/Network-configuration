@@ -29,6 +29,9 @@ This project is a web-based utility built with React.js and Flask to display and
    sudo chmod +x /home/netcon/Network-configuration/cronjob.sh
   ```
   ```
+  cd Network-configuration
+  ```
+  ```
   ./cronjob.sh
   ```
 
