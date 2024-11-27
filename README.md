@@ -46,7 +46,7 @@ This project is a web-based utility built with React.js and Flask to display and
   ./cronjob.sh
   ```
 
-  # Install dependencies for python
+  # Install dependencies for python (Optional)
   ```
   sudo apt install python3-flask-cors
   ```
