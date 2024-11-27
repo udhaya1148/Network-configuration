@@ -17,6 +17,10 @@ This project is a web-based utility built with React.js and Flask to display and
   ```
    sudo su -
   ```
+  # Import project
+  ```
+  git clone https://github.com/udhaya1148/Network-configuration.git
+  ```
 
   # Install full dependencies
   ```
