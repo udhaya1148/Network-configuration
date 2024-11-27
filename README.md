@@ -47,7 +47,7 @@ This project is a web-based utility built with React.js and Flask to display and
   ```
   # (Optional)
   
-  # Install dependencies for python (Optional)
+  # Install dependencies for python
   ```
   sudo apt install python3-flask-cors
   ```
