@@ -25,15 +25,15 @@ sudo chmod +x "$BIN_DIR/arp-pythonscript.py"
 
 # Remove old crontab entries (if they exist)
 echo "Removing old crontab entries..."
-crontab -l | grep -v "/bin/Network-configuration.py" | grep -v "/bin/arp-pythonscript.py" | crontab -
+crontab -l | grep -v "/bin/Network-configuration.py" | grep -v "/bin/arp-pythonscript.py" | grep -v "/bin/bash /home/netcon/Network-configuration/PythonScript/start-vite.sh" | crontab -
 
 # Set up new crontab entries
 echo "Setting up crontab..."
 (crontab -l 2>/dev/null; echo "@reboot /usr/bin/python3 /bin/Network-configuration.py") | crontab -
 (crontab -l 2>/dev/null; echo "@reboot /usr/bin/python3 /bin/arp-pythonscript.py") | crontab -
 
-# Add crontab entry for start-vite.sh
+# Add or update crontab entry for start-vite.sh
 echo "Setting up crontab for start-vite.sh..."
-(crontab -l 2>/dev/null; echo "@reboot /bin/bash /home/netcon/Network-configuration/PythonScript/start-vite.sh") | crontab -
+(crontab -l 2>/dev/null | grep -v "/bin/bash /home/netcon/Network-configuration/PythonScript/start-vite.sh"; echo "@reboot /bin/bash /home/netcon/Network-configuration/PythonScript/start-vite.sh") | crontab -
 
 echo "Setup complete!"
