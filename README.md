@@ -13,12 +13,18 @@ This project is a web-based utility built with React.js and Flask to display and
 * The backend listens on http://your-server-ip:5000 and fetches interface data dynamically.
 
 
+  # Switch to root user 
+  ```
+   sudo su -
+  ```
+
   # Install full dependencies
   ```
-  sudo chmod +x /home/netcon/Network-configuration/dependencies.sh
+   cd Network-configuration
+  
   ```
   ```
-  cd Network-configuration
+  chmod +x dependencies.sh
   ```
   ```
   ./dependencies.sh
@@ -26,10 +32,11 @@ This project is a web-based utility built with React.js and Flask to display and
 
   # Setup_Cronjob
   ```
-   sudo chmod +x /home/netcon/Network-configuration/cronjob.sh
-  ```
-  ```
   cd Network-configuration
+  
+  ```
+  ```
+   chmod +x cronjob.sh
   ```
   ```
   ./cronjob.sh
