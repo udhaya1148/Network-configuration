@@ -19,7 +19,7 @@ if [ -d "$BASE_PATH" ]; then
     cd "$BASE_PATH" || { echo "Failed to navigate to $BASE_PATH"; exit 1; }
 
     # Install React and dependencies
-    npm install -g npm@latest || { echo "Failed to install npm dependencies"; exit 1; }
+    sudo npm install -g npm@latest || { echo "Failed to install npm dependencies"; exit 1; }
 
    # npm install || { echo "Failed to install npm dependencies"; exit 1; }
     npm install react-router-dom 
