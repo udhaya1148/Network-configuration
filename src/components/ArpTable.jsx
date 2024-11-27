@@ -8,7 +8,7 @@ const ArpTable = () => {
   // Function to fetch ARP data
   const fetchArpData = async () => {
     try {
-      const response = await fetch("http://172.18.1.172:5002/arp");
+      const response = await fetch("/api2/arp");
       if (!response.ok) {
         throw new Error(`Failed to fetch ARP data: ${response.statusText}`);
       }
