@@ -1,10 +1,17 @@
 #Network-Configuration
 sudo cp -i /home/netcon/Network-configuration/PythonScript/Network-configuration.py /bin
+sudo chmod +x /bin/Network-configuration.py
 sudo crontab -e
 @reboot /usr/bin/python3 /bin/Network-configuration.py
-sudo chmod +x /bin/Network-configuration.py
+
 # Static-arp 
 sudo cp -i /home/netcon/Network-configuration/PythonScript/arp-pythonscript.py
+sudo chmod +x /bin/arp-pythonscript.py
 sudo crontab -e
 @reboot /usr/bin/python3 /bin/arp-pythonscript.py
 sudo chmod +x /bin/arp-pythonscript.py
+
+# React
+sudo chmod +x /home/netcon/Network-configuration/PythonScript/start-vite.sh
+crontab -e
+@reboot /home/netcon/Network-configuration/PythonScript/start-vite.sh
