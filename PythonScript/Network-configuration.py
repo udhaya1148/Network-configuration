@@ -229,27 +229,40 @@ def check_os_version():
 
 def setup_network_for_ubuntu22():
     """Set up network configuration specific to Ubuntu 22.04."""
+    marker_file = "/etc/netplan/setup_completed.marker"
+    
     try:
-        # Disable Network Configuration in Cloud-Init
-        with open("/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg", "w") as f:
-            f.write("network: {config: disabled}\n")
-        
-        # Regenerate the Network Configuration
-        netplan_config = """
+        if not os.path.exists(marker_file):
+            # First-time setup logic
+            print("First-time setup detected. Configuring network...")
+            
+            # Disable Network Configuration in Cloud-Init
+            with open("/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg", "w") as f:
+                f.write("network: {config: disabled}\n")
+            
+            # Regenerate the Network Configuration
+            netplan_config = """
 network:
     version: 2
     ethernets:
         enp4s0:
             dhcp4: true
 """
-        with open("/etc/netplan/50-cloud-init.yaml", "w") as f:
-            f.write(netplan_config)
-        
-        # Apply the New Configuration
-        subprocess.run(['sudo', 'netplan', 'apply'], check=True)
-        print("Network configuration applied successfully.")
+            with open("/etc/netplan/50-cloud-init.yaml", "w") as f:
+                f.write(netplan_config)
+            
+            # Apply the New Configuration
+            subprocess.run(['sudo', 'netplan', 'apply'], check=True)
+            print("Network configuration applied successfully.")
+            
+            # Create the marker file to indicate setup is done
+            with open(marker_file, "w") as f:
+                f.write("Setup completed.")
+        else:
+            print("Setup already completed. Skipping network configuration.")
     except Exception as e:
         print(f"Error setting up network for Ubuntu 22: {e}")
+
 
 if __name__ == "__main__":
     os_version = check_os_version()
