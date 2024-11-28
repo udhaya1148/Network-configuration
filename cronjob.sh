@@ -37,3 +37,5 @@ echo "Setting up crontab for start-vite.sh..."
 (crontab -l 2>/dev/null | grep -v "/bin/bash /root/Network-configuration/PythonScript/start-vite.sh"; echo "@reboot /bin/bash /root/Network-configuration/PythonScript/start-vite.sh") | crontab -
 
 echo "Setup complete!"
+
+sudo init 6
