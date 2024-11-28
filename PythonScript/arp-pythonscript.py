@@ -60,30 +60,27 @@ def get_interfaces():
 # Add static ARP entry
 def add_static_arp(ip, mac):
     try:
-        # Static ARP entry command
+        # Ensure the ARP script starts with the shebang
         arp_entry = f"arp -s {ip} {mac}\n"
         
-        # Check if the ARP entry already exists in the script
-        if os.path.exists(ARP_FILE_PATH):
-            with open(ARP_FILE_PATH, 'r') as file:
-                existing_script = file.read()
-                if arp_entry not in existing_script:
-                    # Append the new ARP entry to the file if it doesn't exist
-                    with open(ARP_FILE_PATH, 'a') as file_append:
-                        file_append.write(arp_entry)
-        else:
-            # Create a new script if it doesn't exist
-            script_content = f"#!/bin/bash\n{arp_entry}"
+        if not os.path.exists(ARP_FILE_PATH):
+            # Create a new script with a proper header
             with open(ARP_FILE_PATH, 'w') as file:
-                file.write(script_content)
+                file.write(f"#!/bin/bash\n{arp_entry}")
+        else:
+            with open(ARP_FILE_PATH, 'r+') as file:
+                content = file.read()
+                if arp_entry not in content:
+                    file.write(arp_entry)
 
-        # Make the file executable
-        os.chmod(ARP_FILE_PATH, 0o755)  # 755 permissions to make it executable
-
+        os.chmod(ARP_FILE_PATH, 0o755)  # Ensure the file is executable
+        
         # Execute the script immediately
         subprocess.run(['bash', ARP_FILE_PATH], check=True)
 
-        return {"message": "Static ARP entry added, script saved, and executed successfully"}
+        return {"message": "Static ARP entry added and script executed successfully"}
+    except subprocess.CalledProcessError as e:
+        return {"error": f"Command execution failed: {str(e)}"}
     except Exception as e:
         return {"error": f"Failed to add ARP entry: {str(e)}"}
 
@@ -145,8 +142,7 @@ def add_static_arp_entry():
     ip = data.get('ip')
     mac = data.get('mac')
 
-
-    if ip and mac :
+    if ip and mac:
         result = add_static_arp(ip, mac)
         if 'error' in result:
             return jsonify(result), 500
@@ -159,7 +155,7 @@ def delete_static_arp_entry():
     data = request.get_json()
     ip = data.get('ip')
 
-    if ip :
+    if ip:
         result = delete_static_arp(ip)
         if 'error' in result:
             return jsonify(result), 500
@@ -167,13 +163,18 @@ def delete_static_arp_entry():
     return jsonify({"error": "Missing required data (ip)"}), 400
 
 if __name__ == '__main__':
-    # Ensure the ARP file exists and is executable
+    # Ensure the ARP file has the shebang and is executable
     if not os.path.exists(ARP_FILE_PATH):
-        open(ARP_FILE_PATH, 'a').close()
-        os.chmod(ARP_FILE_PATH, 0o755)
-    
+        with open(ARP_FILE_PATH, 'w') as file:
+            file.write("#!/bin/bash\n")
+    os.chmod(ARP_FILE_PATH, 0o755)
+
     # Get the current filename dynamically
     current_file = os.path.basename(__file__)  # Get the filename of the current script
 
     # Run gunicorn programmatically using subprocess
-    subprocess.run(['gunicorn', '-w', '4', '-b', '0.0.0.0:5002', current_file[:-3] + ':app'])
+    try:
+        subprocess.run(['gunicorn', '-w', '4', '-b', '0.0.0.0:5002', current_file[:-3] + ':app'], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to start gunicorn: {e}")
+        sys.exit(1)
