@@ -12,7 +12,7 @@ This project is a web-based utility built with React.js and Flask to display and
 * Access the web UI to view and modify network settings at http://your-server-ip:3000.
 * The backend listens on http://your-server-ip:5000 and fetches interface data dynamically.
 
-# PreRequesties after os installation
+# Prerequisites after os installation
 ```
 sudo apt update
 ```
@@ -20,7 +20,10 @@ sudo apt update
 sudo apt upgrade
 ```
 ```
-sudo apt install net-tools
+sudo apt install net-tools 
+```
+```
+sudo apt install iptables-persistent
 ```
 
   # Switch to root user 
