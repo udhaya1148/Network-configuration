@@ -65,7 +65,7 @@ const AddStaticArp = () => {
         // Hide success message after 3 seconds
         setTimeout(() => {
           setSuccessMessage(null);
-        }, 2000);
+        }, 3000);
       } else {
         setSuccessMessage(null);
         setError(result.error || "Failed to add ARP entry.");
