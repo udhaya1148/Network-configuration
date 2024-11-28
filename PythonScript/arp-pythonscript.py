@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Path to save the static ARP script
-ARP_FILE_PATH = '/etc/networkd-dispatcher/routable.d/setarp-static'
+ARP_FILE_PATH = '/etc/networkd-dispatcher/routable.d/setarp-static.sh'
 
 # Get ARP table data
 def get_arp_data():
