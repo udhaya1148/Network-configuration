@@ -61,6 +61,11 @@ const AddStaticArp = () => {
         setIp("");
         setMac("");
         setIpError("");
+
+        // Hide success message after 3 seconds
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 2000);
       } else {
         setSuccessMessage(null);
         setError(result.error || "Failed to add ARP entry.");
