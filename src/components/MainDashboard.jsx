@@ -7,7 +7,7 @@ function MainDashboard() {
       <SideMenu />
       <div className="flex-grow p-1 overflow-auto  justify-center">
          <iframe
-          src="http://localhost:3000/"
+          src="/api3"
           
           frameBorder="0"
           title="Dashboard"
