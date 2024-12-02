@@ -58,7 +58,7 @@ sudo apt install iptables-persistent
   ```
   ./cronjob.sh
   ```
-  # (Optional)
+  # (Optional for Manual installation)
   
   # Install dependencies for python
   ```
