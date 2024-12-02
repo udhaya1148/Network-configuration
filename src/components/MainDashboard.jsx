@@ -7,7 +7,7 @@ function MainDashboard() {
       <SideMenu />
       <div className="flex-grow p-1 overflow-auto  justify-center">
          <iframe
-          src="/api3"
+          src="/grafana/"
           
           frameBorder="0"
           title="Dashboard"
