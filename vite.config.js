@@ -16,7 +16,11 @@ export default defineConfig({
         target: 'http://localhost:5002', // Flask server URL
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api2/, '')
-
+      },
+      '/api3': {
+        target: 'http://localhost:3000', // Flask server URL
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api3/, ''),
       },
     },
   },
