@@ -33,8 +33,6 @@ sudo apt install iptables-persistent
 
   # Import project
   ```
-User name : udhaya1148
-password : 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
   git clone https://github.com/udhaya1148/Network-configuration.git
   ```
 
@@ -56,10 +54,10 @@ password : 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
   
   ```
   ```
-   chmod +x cronjob.sh
+   chmod +x run_services.sh
   ```
   ```
-  ./cronjob.sh
+  ./run_services.sh
   ```
   # (Optional for Manual installation)
   
