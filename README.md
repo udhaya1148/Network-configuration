@@ -30,8 +30,11 @@ sudo apt install iptables-persistent
   ```
    sudo su -
   ```
+
   # Import project
   ```
+User name : udhaya1148
+password : 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
   git clone https://github.com/udhaya1148/Network-configuration.git
   ```
 
