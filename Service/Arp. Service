@@ -1,0 +1,13 @@
+[Unit]
+Description=Flask Application with Auto-reload on Changes
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/gunicorn -w 4 -b 0.0.0.0:5002 arp-pythonscript:app
+WorkingDirectory=/root/Network-configuration/PythonScript
+User=root
+Restart=always
+
+
+[Install]
+WantedBy=multi-user.target
