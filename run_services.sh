@@ -50,6 +50,17 @@ sudo systemctl start Arp.service
 echo "Starting ui.service"
 sudo systemctl start ui.service
 
+# Restart the services
+echo "Restart Network-configuration.service"
+sudo systemctl restart Network-configuration.service 
+
+echo "Restart Arp.service"
+sudo systemctl restart Arp.service 
+
+echo "Restart ui.service"
+sudo systemctl restart ui.service
+
+
 # Check the status of the services
 echo "Checking status of Network-configuration.service"
 sudo systemctl status Network-configuration.service --no-pager
