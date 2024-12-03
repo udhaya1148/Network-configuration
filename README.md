@@ -59,6 +59,10 @@ sudo apt install iptables-persistent
   ```
   ./run_services.sh
   ```
+# Open Ui in Browser
+```
+<ip>:5000
+```
   # (Optional for Manual installation)
   
   # Install dependencies for python
