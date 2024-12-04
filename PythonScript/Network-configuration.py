@@ -229,39 +229,43 @@ def check_os_version():
 
 def setup_network_for_ubuntu22():
     """Set up network configuration specific to Ubuntu 22.04."""
-    marker_file = "/etc/netplan/setup_completed.marker"
-    
     try:
-        if not os.path.exists(marker_file):
-            # First-time setup logic
-            print("First-time setup detected. Configuring network...")
-            
-            # Disable Network Configuration in Cloud-Init
-            with open("/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg", "w") as f:
-                f.write("network: {config: disabled}\n")
-            
-            # Regenerate the Network Configuration
-            netplan_config = """
+        print("Configuring network for the first time...")
+
+        # Define Netplan directory and new configuration path
+        netplan_dir = "/etc/netplan"
+        new_netplan_config_path = "/etc/netplan/01-netconfig.yaml"
+
+        # Delete all existing Netplan configuration files
+        for file in glob.glob(os.path.join(netplan_dir, "*.yaml")):
+            try:
+                os.remove(file)
+                print(f"Deleted existing Netplan file: {file}")
+            except Exception as delete_error:
+                print(f"Failed to delete {file}: {delete_error}")
+
+        # Disable Network Configuration in Cloud-Init
+        with open("/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg", "w") as f:
+            f.write("network: {config: disabled}\n")
+        
+        # Create the new Netplan configuration
+        netplan_config = """
 network:
     version: 2
     ethernets:
         enp4s0:
             dhcp4: true
 """
-            with open("/etc/netplan/50-cloud-init.yaml", "w") as f:
-                f.write(netplan_config)
-            
-            # Apply the New Configuration
-            subprocess.run(['sudo', 'netplan', 'apply'], check=True)
-            print("Network configuration applied successfully.")
-            
-            # Create the marker file to indicate setup is done
-            with open(marker_file, "w") as f:
-                f.write("Setup completed.")
-        else:
-            print("Setup already completed. Skipping network configuration.")
+        with open(new_netplan_config_path, "w") as f:
+            f.write(netplan_config)
+        print(f"Created new Netplan configuration: {new_netplan_config_path}")
+        
+        # Apply the new configuration using Netplan
+        subprocess.run(['sudo', 'netplan', 'apply'], check=True)
+        print("Network configuration applied successfully.")
     except Exception as e:
         print(f"Error setting up network for Ubuntu 22: {e}")
+
 
 
 if __name__ == "__main__":
@@ -274,10 +278,12 @@ if __name__ == "__main__":
     else:
         print(f"OS version {os_version} is not explicitly handled. Proceeding with default logic.")
 
-    script_filename = os.path.basename(__file__)
+    script_filename = os.path.basename(__file__).replace('.py', '')
+    app_module = f"{script_filename}:app"
+
     subprocess.run([
         'gunicorn',
         '-w', '4',          # Number of worker processes
         '-b', '0.0.0.0:5001', # Bind to 0.0.0.0:5001
-        script_filename.replace('.py', ':app')  # Dynamically pass the app name
+        app_module           # Pass the module name dynamically
     ])
