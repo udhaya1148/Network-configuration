@@ -231,6 +231,14 @@ def setup_network_for_ubuntu22():
     """Set up network configuration specific to Ubuntu 22.04."""
     try:
         print("Configuring network for the first time...")
+        
+        # Define the marker file to check for first-time setup
+        marker_file = "/etc/netplan/setup_done.marker"
+        
+        # If the marker file exists, skip setup
+        if os.path.exists(marker_file):
+            print("Network setup has already been performed. Skipping configuration.")
+            return
 
         # Define Netplan directory and new configuration path
         netplan_dir = "/etc/netplan"
@@ -263,8 +271,14 @@ network:
         # Apply the new configuration using Netplan
         subprocess.run(['sudo', 'netplan', 'apply'], check=True)
         print("Network configuration applied successfully.")
+        
+        # Create the marker file to indicate setup completion
+        with open(marker_file, "w") as f:
+            f.write("Setup completed successfully.\n")
+        print("Setup marker file created.")
     except Exception as e:
         print(f"Error setting up network for Ubuntu 22: {e}")
+
 
 
 
