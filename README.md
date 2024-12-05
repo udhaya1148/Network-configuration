@@ -48,11 +48,13 @@ sudo apt install iptables-persistent
   ./dependencies.sh
   ```
 
-  # Setup_Cronjob
+ # Setup_Services
   ```
-  cd Network-configuration
-  
-  ```
+  chmod +x /root/OT-Shield/PythonScript/start-vite.sh
+ ```
+```
+ cd OT-Shield
+```
   ```
    chmod +x run_services.sh
   ```
