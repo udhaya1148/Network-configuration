@@ -50,10 +50,10 @@ sudo apt install iptables-persistent
 
  # Setup_Services
   ```
-  chmod +x /root/OT-Shield/PythonScript/start-vite.sh
+  chmod +x /root/Network-configurationPythonScript/start-vite.sh
  ```
 ```
- cd OT-Shield
+ cd Network-configuration
 ```
   ```
    chmod +x run_services.sh
